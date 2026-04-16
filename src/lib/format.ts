@@ -1,5 +1,27 @@
+const ACRONYMS = new Set([
+  "mdu",
+  "gm",
+  "ap",
+  "ups",
+  "ont",
+  "nvr",
+  "olt",
+  "wifi",
+  "poe",
+  "sn",
+  "mac",
+]);
+
 export function titleCase(s: string): string {
-  return s.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  return s
+    .replace(/[-_]/g, " ")
+    .split(" ")
+    .map((word) => {
+      const lower = word.toLowerCase();
+      if (ACRONYMS.has(lower)) return lower.toUpperCase();
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    })
+    .join(" ");
 }
 
 export function formatDate(d: string | null | undefined): string {
