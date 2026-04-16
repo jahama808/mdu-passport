@@ -37,10 +37,10 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-muted/30">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <Card className="w-full max-w-md card-stat">
         <CardHeader>
-          <CardTitle>MDU Passport</CardTitle>
+          <CardTitle className="nav-brand text-xl">MDU Passport</CardTitle>
           <CardDescription>
             {mode === "signin" ? "Sign in to continue" : "Create an account"}
           </CardDescription>
@@ -69,7 +69,7 @@ function LoginForm() {
               />
             </div>
             {error ? <p className="text-sm text-destructive">{error}</p> : null}
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full btn-gradient" disabled={loading}>
               {loading ? "Working…" : mode === "signin" ? "Sign in" : "Sign up"}
             </Button>
             <button

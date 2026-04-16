@@ -32,7 +32,7 @@ export default async function DashboardPage() {
           </p>
         </div>
         <Link href="/properties/new">
-          <Button>
+          <Button className="btn-gradient">
             <Plus className="h-4 w-4 mr-2" /> New property
           </Button>
         </Link>
@@ -123,12 +123,14 @@ function StatCard({
   value: number;
 }) {
   return (
-    <Card>
-      <CardContent className="py-4 flex items-center gap-3">
+    <Card className="card-stat">
+      <CardContent className="py-4 flex items-center gap-3 relative z-[1]">
         <div className="p-2 rounded-md bg-muted">{icon}</div>
         <div>
-          <div className="text-2xl font-semibold">{value}</div>
-          <div className="text-xs text-muted-foreground">{label}</div>
+          <div className="text-2xl font-semibold font-heading">{value}</div>
+          <div className="text-xs text-muted-foreground uppercase tracking-wide">
+            {label}
+          </div>
         </div>
       </CardContent>
     </Card>

@@ -17,7 +17,7 @@ export default async function PropertiesPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Properties</h1>
         <Link href="/properties/new">
-          <Button>
+          <Button className="btn-gradient">
             <Plus className="h-4 w-4 mr-2" /> New property
           </Button>
         </Link>
