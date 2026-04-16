@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MDU Passport
 
-## Getting Started
+Property management + common area WiFi configurator for Hawaiian Telcom MDU / resort deployments.
 
-First, run the development server:
+Stack: Next.js 16 (App Router) · Supabase · Vercel · shadcn/ui.
+
+## Local development
 
 ```bash
+cp .env.example .env.local
+# fill in NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY,
+# SUPABASE_SERVICE_ROLE_KEY, MDU_WORKSPACE_OWNER_ID
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open <http://localhost:3000>. Sign up with any email/password — Supabase Auth handles the session; all data reads filter by `MDU_WORKSPACE_OWNER_ID`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Dashboard & property list** — status summary per property (completed / in progress / not started common areas).
+- **Property CRUD** — name, slug, type, island, address, GM contact, notes.
+- **Common Area Configurator** — per-property areas (pool, gym, lobby, hallway, courtyard, parking, office, other) with installation status, priority, date, and a dynamic equipment formset (add/remove rows).
+- **Equipment catalog** — reusable equipment types (APs, switches, routers, ONTs, cable, mounts…) shared across properties.
+- **Property Passport** — import walkthrough markdown and render alongside the sighting photo gallery.
+- **Scan viewer** — read-only browser of `property_scans` grouped by location, with signed Supabase Storage URLs for photos.
+- **Property notes** — timestamped notes timeline.
+- **PDF export** — `/api/passport/export?propertyId=…` generates a downloadable passport PDF.
 
-## Learn More
+## Data
 
-To learn more about Next.js, take a look at the following resources:
+Uses the shared Supabase project `ynaexnssjefpayxnvdzi` (alongside the property-scan skill). Reads `properties`, `property_scan_sessions`, `property_scans` and owns `equipment_types`, `common_areas`, `common_area_equipment`, `property_notes`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+RLS is enabled on the MDU Passport tables; the Next.js server uses the service role key and filters by the workspace owner, and the proxy auth gate at `src/proxy.ts` redirects unauthenticated requests to `/login`.
