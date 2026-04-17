@@ -59,7 +59,7 @@ export default function PropertyCardBody({ property }: { property: Property }) {
       ) : (
         <dl className="space-y-1 text-xs">
           {rows.map((r) => (
-            <div key={r.label} className="flex items-baseline gap-2">
+            <div key={r.label} className="flex items-center gap-2">
               <span className="inline-flex items-center gap-1 shrink-0 font-medium">
                 {r.icon}
                 {r.label}
