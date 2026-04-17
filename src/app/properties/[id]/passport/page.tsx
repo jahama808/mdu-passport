@@ -13,8 +13,9 @@ import { titleCase, formatDateTime } from "@/lib/format";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Upload } from "lucide-react";
+import { Mail, Upload } from "lucide-react";
 import PassportImport from "@/components/passport-import";
+import PassportImportEml from "@/components/passport-import-eml";
 
 export default async function PassportPage({
   params,
@@ -40,11 +41,18 @@ export default async function PassportPage({
           <h1 className="text-2xl font-semibold">Property Passport</h1>
           <p className="text-sm text-muted-foreground">{property.name}</p>
         </div>
-        <PassportImport propertyId={id}>
-          <Button variant="outline">
-            <Upload className="h-4 w-4 mr-2" /> Import markdown
-          </Button>
-        </PassportImport>
+        <div className="flex flex-wrap gap-2">
+          <PassportImportEml propertyId={id}>
+            <Button variant="outline">
+              <Mail className="h-4 w-4 mr-2" /> Import .eml
+            </Button>
+          </PassportImportEml>
+          <PassportImport propertyId={id}>
+            <Button variant="outline">
+              <Upload className="h-4 w-4 mr-2" /> Import markdown
+            </Button>
+          </PassportImport>
+        </div>
       </div>
 
       {latestPassport ? (
