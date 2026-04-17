@@ -16,10 +16,11 @@ export type PropertyDetails = {
   customer?: string;
   service_type?: string;
   plan_speed?: string;
-  num_units?: string;
+  billable_units?: string;
   mrc?: string;
   contract_start?: string;
   contract_term?: string;
+  contract_end?: string;
   install_date?: string;
   sales_rep?: string;
   account_manager?: string;

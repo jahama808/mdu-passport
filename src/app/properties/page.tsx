@@ -1,16 +1,16 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
-import { listProperties, statusSummaryForProperties } from "@/lib/data";
+import { listProperties } from "@/lib/data";
 import { titleCase } from "@/lib/format";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import PropertyCardBody from "@/components/property-card-body";
 
 export default async function PropertiesPage() {
   await requireUser();
   const properties = await listProperties();
-  const summary = await statusSummaryForProperties(properties.map((p) => p.id));
 
   return (
     <div className="p-6 space-y-4">
@@ -23,32 +23,21 @@ export default async function PropertiesPage() {
         </Link>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {properties.map((p) => {
-          const s = summary[p.id];
-          return (
-            <Link key={p.id} href={`/properties/${p.id}`}>
-              <Card className="h-full hover:border-foreground/20">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base flex items-center justify-between">
-                    <span className="truncate">{p.name}</span>
-                    <Badge variant="outline">{titleCase(p.type)}</Badge>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2 pt-0">
-                  <div className="text-sm text-muted-foreground">
-                    {p.island ? titleCase(p.island) : "—"}
-                  </div>
-                  {p.address ? (
-                    <div className="text-xs text-muted-foreground truncate">{p.address}</div>
-                  ) : null}
-                  <div className="text-xs text-muted-foreground">
-                    {s.completed} completed · {s.in_progress} in progress · {s.total} total
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          );
-        })}
+        {properties.map((p) => (
+          <Link key={p.id} href={`/properties/${p.id}`}>
+            <Card className="h-full hover:border-foreground/20">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center justify-between">
+                  <span className="truncate">{p.name}</span>
+                  <Badge variant="outline">{titleCase(p.type)}</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <PropertyCardBody property={p} />
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
       </div>
     </div>
   );

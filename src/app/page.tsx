@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Building2, CheckCircle2, Clock, Circle, Plus } from "lucide-react";
+import PropertyCardBody from "@/components/property-card-body";
 
 export default async function DashboardPage() {
   await requireUser();
@@ -71,41 +72,23 @@ export default async function DashboardPage() {
           </Card>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {properties.map((p) => {
-              const s = summary[p.id];
-              return (
-                <Link key={p.id} href={`/properties/${p.id}`}>
-                  <Card className="hover:border-foreground/20 transition-colors h-full">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base flex items-center justify-between">
-                        <span className="truncate">{p.name}</span>
-                        <Badge variant="outline" className="shrink-0 ml-2">
-                          {titleCase(p.type)}
-                        </Badge>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0 space-y-2">
-                      <div className="text-sm text-muted-foreground">
-                        {p.island ? titleCase(p.island) : "—"}
-                        {p.address ? ` · ${p.address}` : ""}
-                      </div>
-                      <div className="flex gap-2 text-xs">
-                        <span className="inline-flex items-center gap-1 text-green-700 dark:text-green-400">
-                          <CheckCircle2 className="h-3.5 w-3.5" /> {s.completed}
-                        </span>
-                        <span className="inline-flex items-center gap-1 text-amber-700 dark:text-amber-400">
-                          <Clock className="h-3.5 w-3.5" /> {s.in_progress}
-                        </span>
-                        <span className="inline-flex items-center gap-1 text-slate-600 dark:text-slate-400">
-                          <Circle className="h-3.5 w-3.5" /> {s.not_started}
-                        </span>
-                        <span className="ml-auto text-muted-foreground">{s.total} total</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              );
-            })}
+            {properties.map((p) => (
+              <Link key={p.id} href={`/properties/${p.id}`}>
+                <Card className="hover:border-foreground/20 transition-colors h-full">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base flex items-center justify-between">
+                      <span className="truncate">{p.name}</span>
+                      <Badge variant="outline" className="shrink-0 ml-2">
+                        {titleCase(p.type)}
+                      </Badge>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <PropertyCardBody property={p} />
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
           </div>
         )}
       </div>
