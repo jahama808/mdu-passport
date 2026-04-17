@@ -40,6 +40,10 @@ const tool = {
       install_date: { type: "string", description: "Activation or install date / deadline" },
       sales_rep: { type: "string", description: "Sales representative name" },
       account_manager: { type: "string", description: "Account manager name" },
+      website: {
+        type: "string",
+        description: "Property or building website URL, if mentioned",
+      },
       scope: {
         type: "string",
         description: "Short scope-of-work / project description (markdown allowed)",

@@ -18,6 +18,8 @@ import {
   FileText,
   StickyNote,
   Download,
+  MapPin,
+  ExternalLink,
 } from "lucide-react";
 
 export default async function PropertyDetailPage({
@@ -82,6 +84,55 @@ export default async function PropertyDetailPage({
         <Stat label="In progress" value={counts.in_progress} tone="amber" />
         <Stat label="Not started" value={counts.not_started} />
       </div>
+
+      {property.address || property.details?.website ? (
+        <Card>
+          <CardHeader className="flex-row items-center justify-between space-y-0">
+            <CardTitle className="text-base flex items-center gap-2">
+              <MapPin className="h-4 w-4" /> Location
+            </CardTitle>
+            {property.details?.website ? (
+              <a
+                href={normalizeUrl(property.details.website)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm inline-flex items-center gap-1 underline underline-offset-4 text-muted-foreground hover:text-foreground"
+              >
+                {displayHost(property.details.website)}
+                <ExternalLink className="h-3.5 w-3.5" />
+              </a>
+            ) : null}
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {property.address ? (
+              <>
+                <div className="text-sm text-muted-foreground">{property.address}</div>
+                <div className="aspect-video w-full overflow-hidden rounded-md border">
+                  <iframe
+                    title={`Map of ${property.name}`}
+                    src={`https://maps.google.com/maps?q=${encodeURIComponent(property.address)}&output=embed`}
+                    className="w-full h-full"
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                </div>
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(property.address)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+                >
+                  Open in Google Maps <ExternalLink className="h-3 w-3" />
+                </a>
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                No address on file — add one to show a map.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      ) : null}
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
@@ -224,6 +275,20 @@ export default async function PropertyDetailPage({
       ) : null}
     </div>
   );
+}
+
+function normalizeUrl(url: string): string {
+  const trimmed = url.trim();
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+}
+
+function displayHost(url: string): string {
+  try {
+    return new URL(normalizeUrl(url)).host.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
 }
 
 function Stat({

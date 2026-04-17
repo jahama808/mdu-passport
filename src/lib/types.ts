@@ -24,6 +24,7 @@ export type PropertyDetails = {
   install_date?: string;
   sales_rep?: string;
   account_manager?: string;
+  website?: string;
   scope?: string;
 };
 
