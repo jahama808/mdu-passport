@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import PropertyCardBody from "@/components/property-card-body";
+import PropertyImportEml from "@/components/property-import-eml";
 
 export default async function PropertiesPage() {
   await requireUser();
@@ -14,13 +15,16 @@ export default async function PropertiesPage() {
 
   return (
     <div className="p-6 space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <h1 className="text-2xl font-semibold">Properties</h1>
-        <Link href="/properties/new">
-          <Button className="btn-gradient">
-            <Plus className="h-4 w-4 mr-2" /> New property
-          </Button>
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <PropertyImportEml />
+          <Link href="/properties/new">
+            <Button className="btn-gradient">
+              <Plus className="h-4 w-4 mr-2" /> New property
+            </Button>
+          </Link>
+        </div>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {properties.map((p) => (

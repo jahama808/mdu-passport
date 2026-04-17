@@ -5,6 +5,11 @@ import { redirect } from "next/navigation";
 import slugify from "slugify";
 import { createServiceClient, WORKSPACE_OWNER_ID } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/auth";
+import {
+  ingestEmlIntoProperty,
+  parseAndExtractEml,
+  type IngestResult,
+} from "@/lib/passport-ingest";
 
 export type PropertyInput = {
   id?: string;
@@ -53,6 +58,87 @@ export async function upsertProperty(input: PropertyInput) {
   revalidatePath("/properties");
   revalidatePath("/");
   return { id: data.id as string };
+}
+
+export type EmlRouteResult = IngestResult & {
+  propertyId: string;
+  propertyName: string;
+  matched: boolean;
+};
+
+export async function importEmlAndRouteToProperty(input: {
+  filename: string;
+  raw: string;
+}): Promise<EmlRouteResult> {
+  await requireUser();
+  const db = createServiceClient();
+
+  const parsed = await parseAndExtractEml(input.raw);
+  const customer = parsed.extracted.customer?.trim();
+  const primaryAddress = parsed.extracted.primary_address?.trim();
+
+  const { data: candidates, error: listError } = await db
+    .from("properties")
+    .select("id,name,address")
+    .eq("user_id", WORKSPACE_OWNER_ID);
+  if (listError) throw listError;
+
+  const nameLower = customer?.toLowerCase();
+  const addressLower = primaryAddress?.toLowerCase();
+
+  let match =
+    nameLower
+      ? candidates?.find((p) => p.name?.toLowerCase().trim() === nameLower)
+      : undefined;
+  if (!match && addressLower) {
+    match = candidates?.find((p) => {
+      const a = p.address?.toLowerCase().trim();
+      if (!a) return false;
+      return a === addressLower || a.includes(addressLower) || addressLower.includes(a);
+    });
+  }
+
+  let propertyId: string;
+  let propertyName: string;
+  let matched = false;
+
+  if (match) {
+    propertyId = match.id as string;
+    propertyName = match.name as string;
+    matched = true;
+  } else {
+    const fallbackName =
+      customer && customer.length > 0
+        ? customer
+        : input.filename.replace(/\.eml$/i, "").trim() || "Untitled property";
+    const slug = slugify(fallbackName, { lower: true, strict: true });
+    const { data: inserted, error: insertError } = await db
+      .from("properties")
+      .insert({
+        user_id: WORKSPACE_OWNER_ID,
+        name: fallbackName,
+        slug,
+        type: "mdu",
+      })
+      .select("id,name")
+      .single();
+    if (insertError) throw insertError;
+    propertyId = inserted.id as string;
+    propertyName = inserted.name as string;
+  }
+
+  const result = await ingestEmlIntoProperty(propertyId, {
+    filename: input.filename,
+    parsed,
+  });
+
+  revalidatePath("/");
+  revalidatePath("/properties");
+  revalidatePath(`/properties/${propertyId}`);
+  revalidatePath(`/properties/${propertyId}/passport`);
+  revalidatePath(`/properties/${propertyId}/edit`);
+
+  return { ...result, propertyId, propertyName, matched };
 }
 
 export async function deleteProperty(id: string) {
