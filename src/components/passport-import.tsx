@@ -34,7 +34,7 @@ export default function PassportImport({
   }
 
   return (
-    <label className="inline-flex">
+    <span className="inline-flex" onClick={() => inputRef.current?.click()}>
       <input
         ref={inputRef}
         type="file"
@@ -43,7 +43,7 @@ export default function PassportImport({
         onChange={onFile}
         disabled={pending}
       />
-      <span className="cursor-pointer inline-flex">{children}</span>
-    </label>
+      {children}
+    </span>
   );
 }
