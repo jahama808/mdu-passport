@@ -73,11 +73,13 @@ export default async function PropertyDetailPage({
         </div>
       </div>
 
-      <Card>
-        <CardContent className="py-4">
-          <PropertyCardBody property={property} />
-        </CardContent>
-      </Card>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card>
+          <CardContent className="py-4">
+            <PropertyCardBody property={property} />
+          </CardContent>
+        </Card>
+      </div>
 
       {property.address || property.details?.website ? (
         <Card>

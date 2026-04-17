@@ -50,21 +50,21 @@ export default function PropertyCardBody({ property }: { property: Property }) {
   }
 
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-1.5 text-foreground">
       {property.address ? (
-        <div className="text-xs text-muted-foreground truncate">{property.address}</div>
+        <div className="text-xs truncate">{property.address}</div>
       ) : null}
       {rows.length === 0 ? (
-        <div className="text-xs text-muted-foreground">No details yet</div>
+        <div className="text-xs">No details yet</div>
       ) : (
         <dl className="space-y-1 text-xs">
           {rows.map((r) => (
-            <div key={r.label} className="flex items-center gap-2">
-              <span className="text-muted-foreground inline-flex items-center gap-1 shrink-0">
+            <div key={r.label} className="flex items-baseline gap-2">
+              <span className="inline-flex items-center gap-1 shrink-0 font-medium">
                 {r.icon}
                 {r.label}
               </span>
-              <span className="ml-auto text-right truncate">{r.value}</span>
+              <span className="truncate">{r.value}</span>
             </div>
           ))}
         </dl>
