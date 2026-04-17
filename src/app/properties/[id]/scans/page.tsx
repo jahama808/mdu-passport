@@ -10,6 +10,7 @@ import {
 import { titleCase, formatDateTime } from "@/lib/format";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import EditableNarration from "@/components/editable-narration";
 
 export default async function ScansPage({
   params,
@@ -135,11 +136,11 @@ export default async function ScansPage({
                             {s.label_mac}
                           </div>
                         ) : null}
-                        {s.narration ? (
-                          <p className="text-xs text-muted-foreground line-clamp-3">
-                            {s.narration}
-                          </p>
-                        ) : null}
+                        <EditableNarration
+                          propertyId={id}
+                          scanId={s.id}
+                          initial={s.narration}
+                        />
                       </div>
                     </div>
                   ))}
