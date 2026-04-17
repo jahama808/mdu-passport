@@ -132,12 +132,12 @@ export default async function PassportPage({
                 .filter((s) => s.photo_urls && s.photo_urls.length > 0)
                 .map((s) => (
                   <div key={s.id} className="space-y-1">
-                    <div className="relative aspect-square rounded overflow-hidden bg-muted">
+                    <div className="relative aspect-[3/4] rounded overflow-hidden bg-muted">
                       <Image
                         src={signed[s.photo_urls![0]] ?? s.photo_urls![0]}
                         alt={s.device_type ?? "sighting"}
                         fill
-                        className="object-cover"
+                        className="object-contain"
                         unoptimized
                       />
                     </div>

@@ -85,21 +85,34 @@ export default async function ScansPage({
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {items.map((s) => (
                     <div key={s.id} className="border rounded-md overflow-hidden">
-                      <div className="aspect-video bg-muted relative overflow-hidden">
-                        {s.photo_urls && s.photo_urls[0] ? (
-                          <Image
-                            src={signed[s.photo_urls[0]] ?? s.photo_urls[0]}
-                            alt={s.device_type ?? "sighting"}
-                            fill
-                            className="object-cover"
-                            unoptimized
-                          />
-                        ) : (
-                          <div className="flex items-center justify-center h-full text-xs text-muted-foreground">
-                            No photo
-                          </div>
-                        )}
-                      </div>
+                      {s.photo_urls && s.photo_urls.length > 0 ? (
+                        <div
+                          className={
+                            s.photo_urls.length > 1
+                              ? "grid grid-cols-2 gap-0.5 bg-muted"
+                              : ""
+                          }
+                        >
+                          {s.photo_urls.map((p) => (
+                            <div
+                              key={p}
+                              className="aspect-[3/4] bg-muted relative overflow-hidden"
+                            >
+                              <Image
+                                src={signed[p] ?? p}
+                                alt={s.device_type ?? "sighting"}
+                                fill
+                                className="object-contain"
+                                unoptimized
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="aspect-[3/4] bg-muted flex items-center justify-center text-xs text-muted-foreground">
+                          No photo
+                        </div>
+                      )}
                       <div className="p-3 space-y-1">
                         <div className="flex items-center gap-2">
                           {s.device_type ? (
