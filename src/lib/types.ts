@@ -22,7 +22,7 @@ export type PropertyDetails = {
   contract_term?: string;
   contract_end?: string;
   install_date?: string;
-  sales_rep?: string;
+  account_exec?: string;
   account_manager?: string;
   website?: string;
   scope?: string;

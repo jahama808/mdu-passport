@@ -34,11 +34,11 @@ export default function PropertyCardBody({ property }: { property: Property }) {
       value: service,
     });
   }
-  if (details.sales_rep) {
+  if (details.account_exec) {
     rows.push({
       icon: <UserRound className="h-3.5 w-3.5" />,
-      label: "Sales rep",
-      value: details.sales_rep,
+      label: "Account Exec",
+      value: details.account_exec,
     });
   }
   if (details.contract_end) {
