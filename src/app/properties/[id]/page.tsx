@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { requireUser } from "@/lib/auth";
+import { notFound, redirect } from "next/navigation";
+import { getSessionContext } from "@/lib/auth";
 import {
   getProperty,
   listCommonAreas,
@@ -28,7 +28,9 @@ export default async function PropertyDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireUser();
+  const { user, role } = await getSessionContext();
+  if (!user) redirect("/login");
+  const canWrite = role === "admin";
   const { id } = await params;
   const property = await getProperty(id);
   if (!property) notFound();
@@ -60,11 +62,13 @@ export default async function PropertyDetailPage({
           ) : null}
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link href={`/properties/${id}/edit`}>
-            <Button variant="outline" size="sm">
-              <Pencil className="h-4 w-4 mr-2" /> Edit
-            </Button>
-          </Link>
+          {canWrite ? (
+            <Link href={`/properties/${id}/edit`}>
+              <Button variant="outline" size="sm">
+                <Pencil className="h-4 w-4 mr-2" /> Edit
+              </Button>
+            </Link>
+          ) : null}
           <Link href={`/api/passport/export?propertyId=${id}`}>
             <Button variant="outline" size="sm">
               <Download className="h-4 w-4 mr-2" /> Export PDF
@@ -134,11 +138,13 @@ export default async function PropertyDetailPage({
         <Card>
           <CardHeader className="flex-row items-center justify-between space-y-0">
             <CardTitle className="text-base">Common areas</CardTitle>
-            <Link href={`/properties/${id}/common-areas/new`}>
-              <Button size="sm" variant="outline">
-                <Plus className="h-4 w-4 mr-1" /> Add
-              </Button>
-            </Link>
+            {canWrite ? (
+              <Link href={`/properties/${id}/common-areas/new`}>
+                <Button size="sm" variant="outline">
+                  <Plus className="h-4 w-4 mr-1" /> Add
+                </Button>
+              </Link>
+            ) : null}
           </CardHeader>
           <CardContent className="space-y-2">
             {areas.length === 0 ? (

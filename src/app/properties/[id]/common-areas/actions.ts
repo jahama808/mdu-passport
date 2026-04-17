@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createServiceClient, WORKSPACE_OWNER_ID } from "@/lib/supabase/server";
-import { requireUser } from "@/lib/auth";
+import { requireAdmin } from "@/lib/auth";
 
 export type EquipmentRow = {
   id?: string;
@@ -26,7 +26,7 @@ export type CommonAreaInput = {
 };
 
 export async function saveCommonArea(input: CommonAreaInput) {
-  await requireUser();
+  await requireAdmin();
   const db = createServiceClient();
   const areaPayload = {
     user_id: WORKSPACE_OWNER_ID,
@@ -106,7 +106,7 @@ export async function saveCommonArea(input: CommonAreaInput) {
 }
 
 export async function deleteCommonArea(propertyId: string, id: string) {
-  await requireUser();
+  await requireAdmin();
   const db = createServiceClient();
   const { error } = await db
     .from("common_areas")

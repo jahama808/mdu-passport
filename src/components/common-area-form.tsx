@@ -42,6 +42,7 @@ type Props = {
   area?: CommonArea;
   equipmentRows?: CommonAreaEquipment[];
   equipmentTypes: EquipmentType[];
+  canWrite?: boolean;
 };
 
 export default function CommonAreaForm({
@@ -49,6 +50,7 @@ export default function CommonAreaForm({
   area,
   equipmentRows = [],
   equipmentTypes,
+  canWrite = true,
 }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -127,7 +129,7 @@ export default function CommonAreaForm({
 
   return (
     <form onSubmit={submit} className="space-y-6">
-      <Card>
+      <fieldset disabled={!canWrite} className="contents"><Card>
         <CardHeader>
           <CardTitle className="text-base">Area details</CardTitle>
         </CardHeader>
@@ -305,14 +307,17 @@ export default function CommonAreaForm({
         </CardContent>
       </Card>
 
+      </fieldset>
       <div className="flex gap-2">
-        <Button type="submit" disabled={pending}>
-          {pending ? "Saving…" : area ? "Save changes" : "Create area"}
-        </Button>
+        {canWrite ? (
+          <Button type="submit" disabled={pending}>
+            {pending ? "Saving…" : area ? "Save changes" : "Create area"}
+          </Button>
+        ) : null}
         <Button type="button" variant="ghost" onClick={() => router.back()}>
-          Cancel
+          {canWrite ? "Cancel" : "Back"}
         </Button>
-        {area ? (
+        {canWrite && area ? (
           <Button
             type="button"
             variant="destructive"

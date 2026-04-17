@@ -1,5 +1,5 @@
-import { notFound } from "next/navigation";
-import { requireUser } from "@/lib/auth";
+import { notFound, redirect } from "next/navigation";
+import { getSessionContext } from "@/lib/auth";
 import { getProperty, listPropertyNotes } from "@/lib/data";
 import NotesTimeline from "@/components/notes-timeline";
 
@@ -8,7 +8,9 @@ export default async function NotesPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireUser();
+  const { user, role } = await getSessionContext();
+  if (!user) redirect("/login");
+  const canWrite = role === "admin";
   const { id } = await params;
   const [property, notes] = await Promise.all([
     getProperty(id),
@@ -21,7 +23,7 @@ export default async function NotesPage({
         <h1 className="text-2xl font-semibold">Notes</h1>
         <p className="text-sm text-muted-foreground">{property.name}</p>
       </div>
-      <NotesTimeline propertyId={id} notes={notes} />
+      <NotesTimeline propertyId={id} notes={notes} canWrite={canWrite} />
     </div>
   );
 }

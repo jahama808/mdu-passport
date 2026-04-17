@@ -43,5 +43,15 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  if (user && path.startsWith("/admin")) {
+    const role = user.app_metadata?.role;
+    if (role !== "admin") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/";
+      url.search = "";
+      return NextResponse.redirect(url);
+    }
+  }
+
   return response;
 }

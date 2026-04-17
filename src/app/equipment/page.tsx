@@ -1,9 +1,12 @@
-import { requireUser } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { getSessionContext } from "@/lib/auth";
 import { listEquipmentTypes } from "@/lib/data";
 import EquipmentManager from "@/components/equipment-manager";
 
 export default async function EquipmentPage() {
-  await requireUser();
+  const { user, role } = await getSessionContext();
+  if (!user) redirect("/login");
+  const canWrite = role === "admin";
   const items = await listEquipmentTypes();
   return (
     <div className="p-6 space-y-4">
@@ -13,7 +16,7 @@ export default async function EquipmentPage() {
           Reusable equipment types for common area installations.
         </p>
       </div>
-      <EquipmentManager items={items} />
+      <EquipmentManager items={items} canWrite={canWrite} />
     </div>
   );
 }

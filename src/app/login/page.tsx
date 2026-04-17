@@ -12,7 +12,6 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/";
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -23,10 +22,7 @@ function LoginForm() {
     setLoading(true);
     setError(null);
     const supabase = createClient();
-    const { error } =
-      mode === "signin"
-        ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
       setError(error.message);
@@ -41,9 +37,7 @@ function LoginForm() {
       <Card className="w-full max-w-md card-stat">
         <CardHeader>
           <CardTitle className="nav-brand text-xl">MDU Passport</CardTitle>
-          <CardDescription>
-            {mode === "signin" ? "Sign in to continue" : "Create an account"}
-          </CardDescription>
+          <CardDescription>Sign in to continue</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={submit} className="space-y-4">
@@ -70,15 +64,11 @@ function LoginForm() {
             </div>
             {error ? <p className="text-sm text-destructive">{error}</p> : null}
             <Button type="submit" className="w-full btn-gradient" disabled={loading}>
-              {loading ? "Working…" : mode === "signin" ? "Sign in" : "Sign up"}
+              {loading ? "Working…" : "Sign in"}
             </Button>
-            <button
-              type="button"
-              className="w-full text-sm text-muted-foreground hover:underline"
-              onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-            >
-              {mode === "signin" ? "Need an account? Sign up" : "Have an account? Sign in"}
-            </button>
+            <p className="text-xs text-center text-muted-foreground">
+              Accounts are created by an administrator.
+            </p>
           </form>
         </CardContent>
       </Card>

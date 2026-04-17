@@ -2,14 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 import { createServiceClient, WORKSPACE_OWNER_ID } from "@/lib/supabase/server";
-import { requireUser } from "@/lib/auth";
+import { requireAdmin } from "@/lib/auth";
 
 export async function updateScanNarration(
   propertyId: string,
   scanId: string,
   narration: string,
 ) {
-  await requireUser();
+  await requireAdmin();
   const db = createServiceClient();
   const trimmed = narration.trim();
   const { error } = await db

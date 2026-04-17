@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import { Orbitron, Rajdhani, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { roleOf } from "@/lib/auth";
 import { Toaster } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
-import { Building2, LayoutGrid, Package, LogOut } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Building2, LayoutGrid, Package, LogOut, Users } from "lucide-react";
 import "./globals.css";
 
 const orbitron = Orbitron({
@@ -31,6 +33,8 @@ export default async function RootLayout({
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  const role = roleOf(user);
+  const isAdmin = role === "admin";
 
   return (
     <html
@@ -56,10 +60,18 @@ export default async function RootLayout({
                   <Link href="/equipment" className="nav-link">
                     <Package className="h-4 w-4" /> Equipment
                   </Link>
+                  {isAdmin ? (
+                    <Link href="/admin/users" className="nav-link">
+                      <Users className="h-4 w-4" /> Users
+                    </Link>
+                  ) : null}
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <span className="text-xs text-muted-foreground">{user.email}</span>
+                <Badge variant={isAdmin ? "default" : "outline"} className="text-xs capitalize">
+                  {role}
+                </Badge>
                 <form action="/auth/signout" method="post">
                   <Button variant="ghost" size="sm" type="submit" title="Sign out">
                     <LogOut className="h-4 w-4" />

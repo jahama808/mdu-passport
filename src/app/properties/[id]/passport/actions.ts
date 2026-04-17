@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createServiceClient, WORKSPACE_OWNER_ID } from "@/lib/supabase/server";
-import { requireUser } from "@/lib/auth";
+import { requireAdmin } from "@/lib/auth";
 import {
   ingestEmlIntoProperty,
   parseAndExtractEml,
@@ -13,7 +13,7 @@ export async function importPassport(
   propertyId: string,
   input: { filename: string; markdown: string },
 ) {
-  await requireUser();
+  await requireAdmin();
   const db = createServiceClient();
   const now = new Date().toISOString();
   const { error } = await db.from("property_scan_sessions").insert({
@@ -36,7 +36,7 @@ export async function importPassportEml(
   propertyId: string,
   input: { filename: string; raw: string },
 ): Promise<EmlImportResult> {
-  await requireUser();
+  await requireAdmin();
 
   const parsed = await parseAndExtractEml(input.raw);
   const result = await ingestEmlIntoProperty(propertyId, {

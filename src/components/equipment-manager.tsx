@@ -45,38 +45,46 @@ const CATEGORIES = [
   "other",
 ];
 
-export default function EquipmentManager({ items }: { items: EquipmentType[] }) {
+export default function EquipmentManager({
+  items,
+  canWrite = true,
+}: {
+  items: EquipmentType[];
+  canWrite?: boolean;
+}) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<EquipmentType | null>(null);
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
-        <Dialog
-          open={open}
-          onOpenChange={(v) => {
-            setOpen(v);
-            if (!v) setEditing(null);
-          }}
-        >
-          <DialogTrigger asChild>
-            <Button
-              onClick={() => {
-                setEditing(null);
-                setOpen(true);
-              }}
-            >
-              <Plus className="h-4 w-4 mr-2" /> New equipment type
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <EquipmentForm
-              equipment={editing ?? undefined}
-              onDone={() => setOpen(false)}
-            />
-          </DialogContent>
-        </Dialog>
-      </div>
+      {canWrite ? (
+        <div className="flex justify-end">
+          <Dialog
+            open={open}
+            onOpenChange={(v) => {
+              setOpen(v);
+              if (!v) setEditing(null);
+            }}
+          >
+            <DialogTrigger asChild>
+              <Button
+                onClick={() => {
+                  setEditing(null);
+                  setOpen(true);
+                }}
+              >
+                <Plus className="h-4 w-4 mr-2" /> New equipment type
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <EquipmentForm
+                equipment={editing ?? undefined}
+                onDone={() => setOpen(false)}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
+      ) : null}
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Equipment types</CardTitle>
@@ -95,7 +103,7 @@ export default function EquipmentManager({ items }: { items: EquipmentType[] }) 
                   <TableHead>Category</TableHead>
                   <TableHead>Manufacturer</TableHead>
                   <TableHead>Model</TableHead>
-                  <TableHead className="w-24" />
+                  {canWrite ? <TableHead className="w-24" /> : null}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -105,15 +113,17 @@ export default function EquipmentManager({ items }: { items: EquipmentType[] }) 
                     <TableCell>{e.category ?? "—"}</TableCell>
                     <TableCell>{e.manufacturer ?? "—"}</TableCell>
                     <TableCell>{e.model ?? "—"}</TableCell>
-                    <TableCell className="text-right">
-                      <RowActions
-                        item={e}
-                        onEdit={() => {
-                          setEditing(e);
-                          setOpen(true);
-                        }}
-                      />
-                    </TableCell>
+                    {canWrite ? (
+                      <TableCell className="text-right">
+                        <RowActions
+                          item={e}
+                          onEdit={() => {
+                            setEditing(e);
+                            setOpen(true);
+                          }}
+                        />
+                      </TableCell>
+                    ) : null}
                   </TableRow>
                 ))}
               </TableBody>

@@ -2,10 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { createServiceClient, WORKSPACE_OWNER_ID } from "@/lib/supabase/server";
-import { requireUser } from "@/lib/auth";
+import { requireAdmin } from "@/lib/auth";
 
 export async function addNote(propertyId: string, content: string) {
-  await requireUser();
+  await requireAdmin();
   const db = createServiceClient();
   const trimmed = content.trim();
   if (!trimmed) throw new Error("Note cannot be empty");
@@ -20,7 +20,7 @@ export async function addNote(propertyId: string, content: string) {
 }
 
 export async function deleteNote(propertyId: string, id: string) {
-  await requireUser();
+  await requireAdmin();
   const db = createServiceClient();
   const { error } = await db
     .from("property_notes")

@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { requireUser } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { getSessionContext } from "@/lib/auth";
 import { listProperties } from "@/lib/data";
 import { titleCase } from "@/lib/format";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,21 +11,25 @@ import PropertyCardBody from "@/components/property-card-body";
 import PropertyImportEml from "@/components/property-import-eml";
 
 export default async function PropertiesPage() {
-  await requireUser();
+  const { user, role } = await getSessionContext();
+  if (!user) redirect("/login");
+  const canWrite = role === "admin";
   const properties = await listProperties();
 
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <h1 className="text-2xl font-semibold">Properties</h1>
-        <div className="flex flex-wrap gap-2">
-          <PropertyImportEml />
-          <Link href="/properties/new">
-            <Button className="btn-gradient">
-              <Plus className="h-4 w-4 mr-2" /> New property
-            </Button>
-          </Link>
-        </div>
+        {canWrite ? (
+          <div className="flex flex-wrap gap-2">
+            <PropertyImportEml />
+            <Link href="/properties/new">
+              <Button className="btn-gradient">
+                <Plus className="h-4 w-4 mr-2" /> New property
+              </Button>
+            </Link>
+          </div>
+        ) : null}
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {properties.map((p) => (

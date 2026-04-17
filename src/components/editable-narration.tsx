@@ -12,10 +12,12 @@ export default function EditableNarration({
   propertyId,
   scanId,
   initial,
+  canWrite = true,
 }: {
   propertyId: string;
   scanId: string;
   initial: string | null;
+  canWrite?: boolean;
 }) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
@@ -41,6 +43,12 @@ export default function EditableNarration({
   function cancel() {
     setValue(initial ?? "");
     setEditing(false);
+  }
+
+  if (!canWrite) {
+    return initial ? (
+      <p className="text-xs text-muted-foreground whitespace-pre-wrap">{initial}</p>
+    ) : null;
   }
 
   if (editing) {

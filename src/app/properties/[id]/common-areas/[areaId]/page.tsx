@@ -1,5 +1,5 @@
-import { notFound } from "next/navigation";
-import { requireUser } from "@/lib/auth";
+import { notFound, redirect } from "next/navigation";
+import { getSessionContext } from "@/lib/auth";
 import {
   getCommonArea,
   getProperty,
@@ -13,7 +13,9 @@ export default async function CommonAreaDetailPage({
 }: {
   params: Promise<{ id: string; areaId: string }>;
 }) {
-  await requireUser();
+  const { user, role } = await getSessionContext();
+  if (!user) redirect("/login");
+  const canWrite = role === "admin";
   const { id, areaId } = await params;
   const [property, area, equipmentRows, equipmentTypes] = await Promise.all([
     getProperty(id),
@@ -33,6 +35,7 @@ export default async function CommonAreaDetailPage({
         area={area}
         equipmentRows={equipmentRows}
         equipmentTypes={equipmentTypes}
+        canWrite={canWrite}
       />
     </div>
   );

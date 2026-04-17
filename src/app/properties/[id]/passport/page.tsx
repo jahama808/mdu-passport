@@ -1,8 +1,8 @@
 import Image from "next/image";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { requireUser } from "@/lib/auth";
+import { getSessionContext } from "@/lib/auth";
 import {
   getProperty,
   listPropertyDocuments,
@@ -22,7 +22,9 @@ export default async function PassportPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireUser();
+  const { user, role } = await getSessionContext();
+  if (!user) redirect("/login");
+  const canWrite = role === "admin";
   const { id } = await params;
   const property = await getProperty(id);
   if (!property) notFound();
@@ -48,10 +50,12 @@ export default async function PassportPage({
           <h1 className="text-2xl font-semibold">Property Passport</h1>
           <p className="text-sm text-muted-foreground">{property.name}</p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <PassportImportEml propertyId={id} />
-          <PassportImport propertyId={id} />
-        </div>
+        {canWrite ? (
+          <div className="flex flex-wrap gap-2">
+            <PassportImportEml propertyId={id} />
+            <PassportImport propertyId={id} />
+          </div>
+        ) : null}
       </div>
 
       {detailEntries.length > 0 ? (

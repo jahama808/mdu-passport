@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { requireUser } from "@/lib/auth";
+import { requireAdmin } from "@/lib/auth";
 import { getProperty, listEquipmentTypes } from "@/lib/data";
 import CommonAreaForm from "@/components/common-area-form";
 
@@ -8,7 +8,7 @@ export default async function NewCommonAreaPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireUser();
+  await requireAdmin();
   const { id } = await params;
   const [property, equipmentTypes] = await Promise.all([
     getProperty(id),

@@ -1,12 +1,15 @@
 import Link from "next/link";
-import { requireUser } from "@/lib/auth";
+import { getSessionContext } from "@/lib/auth";
+import { redirect } from "next/navigation";
 import { listProperties } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import DashboardPropertyGrid from "@/components/dashboard-property-grid";
 
 export default async function DashboardPage() {
-  await requireUser();
+  const { user, role } = await getSessionContext();
+  if (!user) redirect("/login");
+  const canWrite = role === "admin";
   const properties = await listProperties();
 
   return (
@@ -18,11 +21,13 @@ export default async function DashboardPage() {
             {properties.length} properties
           </p>
         </div>
-        <Link href="/properties/new">
-          <Button className="btn-gradient">
-            <Plus className="h-4 w-4 mr-2" /> New property
-          </Button>
-        </Link>
+        {canWrite ? (
+          <Link href="/properties/new">
+            <Button className="btn-gradient">
+              <Plus className="h-4 w-4 mr-2" /> New property
+            </Button>
+          </Link>
+        ) : null}
       </div>
 
       <DashboardPropertyGrid properties={properties} />

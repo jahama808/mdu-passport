@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { notFound } from "next/navigation";
-import { requireUser } from "@/lib/auth";
+import { notFound, redirect } from "next/navigation";
+import { getSessionContext } from "@/lib/auth";
 import {
   getProperty,
   listScanSessions,
@@ -17,7 +17,9 @@ export default async function ScansPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireUser();
+  const { user, role } = await getSessionContext();
+  if (!user) redirect("/login");
+  const canWrite = role === "admin";
   const { id } = await params;
   const property = await getProperty(id);
   if (!property) notFound();
@@ -140,6 +142,7 @@ export default async function ScansPage({
                           propertyId={id}
                           scanId={s.id}
                           initial={s.narration}
+                          canWrite={canWrite}
                         />
                       </div>
                     </div>

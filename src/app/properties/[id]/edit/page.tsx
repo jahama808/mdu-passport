@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { requireUser } from "@/lib/auth";
+import { requireAdmin } from "@/lib/auth";
 import { getProperty } from "@/lib/data";
 import PropertyForm from "@/components/property-form";
 
@@ -8,7 +8,7 @@ export default async function EditPropertyPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireUser();
+  await requireAdmin();
   const { id } = await params;
   const property = await getProperty(id);
   if (!property) notFound();

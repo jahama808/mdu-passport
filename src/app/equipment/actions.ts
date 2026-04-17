@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createServiceClient, WORKSPACE_OWNER_ID } from "@/lib/supabase/server";
-import { requireUser } from "@/lib/auth";
+import { requireAdmin } from "@/lib/auth";
 
 export type EquipmentInput = {
   id?: string;
@@ -14,7 +14,7 @@ export type EquipmentInput = {
 };
 
 export async function upsertEquipmentType(input: EquipmentInput) {
-  await requireUser();
+  await requireAdmin();
   const db = createServiceClient();
   const payload = {
     user_id: WORKSPACE_OWNER_ID,
@@ -39,7 +39,7 @@ export async function upsertEquipmentType(input: EquipmentInput) {
 }
 
 export async function deleteEquipmentType(id: string) {
-  await requireUser();
+  await requireAdmin();
   const db = createServiceClient();
   const { error } = await db
     .from("equipment_types")

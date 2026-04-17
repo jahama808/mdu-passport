@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import slugify from "slugify";
 import { createServiceClient, WORKSPACE_OWNER_ID } from "@/lib/supabase/server";
-import { requireUser } from "@/lib/auth";
+import { requireAdmin } from "@/lib/auth";
 import {
   ingestEmlIntoProperty,
   parseAndExtractEml,
@@ -24,7 +24,7 @@ export type PropertyInput = {
 };
 
 export async function upsertProperty(input: PropertyInput) {
-  await requireUser();
+  await requireAdmin();
   const db = createServiceClient();
   const slug =
     input.slug && input.slug.trim().length > 0
@@ -70,7 +70,7 @@ export async function importEmlAndRouteToProperty(input: {
   filename: string;
   raw: string;
 }): Promise<EmlRouteResult> {
-  await requireUser();
+  await requireAdmin();
   const db = createServiceClient();
 
   const parsed = await parseAndExtractEml(input.raw);
@@ -142,7 +142,7 @@ export async function importEmlAndRouteToProperty(input: {
 }
 
 export async function deleteProperty(id: string) {
-  await requireUser();
+  await requireAdmin();
   const db = createServiceClient();
   const { error } = await db
     .from("properties")

@@ -14,9 +14,11 @@ import { addNote, deleteNote } from "@/app/properties/[id]/notes/actions";
 export default function NotesTimeline({
   propertyId,
   notes,
+  canWrite = true,
 }: {
   propertyId: string;
   notes: PropertyNote[];
+  canWrite?: boolean;
 }) {
   const router = useRouter();
   const [content, setContent] = useState("");
@@ -50,19 +52,21 @@ export default function NotesTimeline({
 
   return (
     <div className="space-y-4">
-      <form onSubmit={submit} className="space-y-2">
-        <Textarea
-          rows={3}
-          placeholder="Add a note about this property…"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-        />
-        <div className="flex justify-end">
-          <Button type="submit" disabled={pending || !content.trim()}>
-            {pending ? "Adding…" : "Add note"}
-          </Button>
-        </div>
-      </form>
+      {canWrite ? (
+        <form onSubmit={submit} className="space-y-2">
+          <Textarea
+            rows={3}
+            placeholder="Add a note about this property…"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+          />
+          <div className="flex justify-end">
+            <Button type="submit" disabled={pending || !content.trim()}>
+              {pending ? "Adding…" : "Add note"}
+            </Button>
+          </div>
+        </form>
+      ) : null}
       {notes.length === 0 ? (
         <Card>
           <CardContent className="py-6 text-sm text-center text-muted-foreground">
@@ -80,14 +84,16 @@ export default function NotesTimeline({
                   </div>
                   <p className="whitespace-pre-wrap text-sm">{n.content}</p>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => remove(n.id)}
-                  disabled={pending}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                {canWrite ? (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => remove(n.id)}
+                    disabled={pending}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                ) : null}
               </CardContent>
             </Card>
           ))}
