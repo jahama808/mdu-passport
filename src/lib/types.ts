@@ -86,6 +86,17 @@ export type PropertyNote = {
   created_at: string;
 };
 
+export type PropertyDocument = {
+  id: string;
+  user_id: string;
+  property_id: string;
+  kind: string;
+  filename: string;
+  subject: string | null;
+  content_md: string;
+  created_at: string;
+};
+
 export type PropertyScanSession = {
   id: string;
   user_id: string;

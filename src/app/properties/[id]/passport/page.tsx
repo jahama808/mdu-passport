@@ -5,6 +5,7 @@ import remarkGfm from "remark-gfm";
 import { requireUser } from "@/lib/auth";
 import {
   getProperty,
+  listPropertyDocuments,
   listScanSessions,
   listScansForProperty,
   signedPhotoUrls,
@@ -13,8 +14,6 @@ import { titleCase, formatDateTime } from "@/lib/format";
 import type { PropertyDetails } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Mail, Upload } from "lucide-react";
 import PassportImport from "@/components/passport-import";
 import PassportImportEml from "@/components/passport-import-eml";
 
@@ -27,9 +26,10 @@ export default async function PassportPage({
   const { id } = await params;
   const property = await getProperty(id);
   if (!property) notFound();
-  const [sessions, scans] = await Promise.all([
+  const [sessions, scans, documents] = await Promise.all([
     listScanSessions(id),
     listScansForProperty(id),
+    listPropertyDocuments(id),
   ]);
   const latestPassport = sessions.find((s) => s.passport_md)?.passport_md ?? null;
   const photos = scans.flatMap((s) => s.photo_urls ?? []);
@@ -49,16 +49,8 @@ export default async function PassportPage({
           <p className="text-sm text-muted-foreground">{property.name}</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <PassportImportEml propertyId={id}>
-            <Button variant="outline">
-              <Mail className="h-4 w-4 mr-2" /> Import .eml
-            </Button>
-          </PassportImportEml>
-          <PassportImport propertyId={id}>
-            <Button variant="outline">
-              <Upload className="h-4 w-4 mr-2" /> Import markdown
-            </Button>
-          </PassportImport>
+          <PassportImportEml propertyId={id} />
+          <PassportImport propertyId={id} />
         </div>
       </div>
 
@@ -78,6 +70,36 @@ export default async function PassportPage({
                 </div>
               ))}
             </dl>
+          </CardContent>
+        </Card>
+      ) : null}
+
+      {documents.length > 0 ? (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Documents</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {documents.map((doc) => (
+              <details key={doc.id} className="border rounded-md">
+                <summary className="cursor-pointer px-3 py-2 flex items-center justify-between gap-2">
+                  <span className="font-medium text-sm">
+                    {doc.subject || doc.filename}
+                  </span>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                      {titleCase(doc.kind)}
+                    </Badge>
+                    <span>{formatDateTime(doc.created_at)}</span>
+                  </div>
+                </summary>
+                <div className="prose prose-sm max-w-none dark:prose-invert px-3 pb-3 pt-1">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {doc.content_md}
+                  </ReactMarkdown>
+                </div>
+              </details>
+            ))}
           </CardContent>
         </Card>
       ) : null}

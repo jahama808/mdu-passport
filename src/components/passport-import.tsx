@@ -3,15 +3,11 @@
 import { useRef, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Loader2, Upload } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { importPassport } from "@/app/properties/[id]/passport/actions";
 
-export default function PassportImport({
-  propertyId,
-  children,
-}: {
-  propertyId: string;
-  children: React.ReactNode;
-}) {
+export default function PassportImport({ propertyId }: { propertyId: string }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [pending, startTransition] = useTransition();
   const router = useRouter();
@@ -34,7 +30,7 @@ export default function PassportImport({
   }
 
   return (
-    <span className="inline-flex" onClick={() => inputRef.current?.click()}>
+    <>
       <input
         ref={inputRef}
         type="file"
@@ -43,7 +39,21 @@ export default function PassportImport({
         onChange={onFile}
         disabled={pending}
       />
-      {children}
-    </span>
+      <Button
+        variant="outline"
+        onClick={() => inputRef.current?.click()}
+        disabled={pending}
+      >
+        {pending ? (
+          <>
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Uploading…
+          </>
+        ) : (
+          <>
+            <Upload className="h-4 w-4 mr-2" /> Import markdown
+          </>
+        )}
+      </Button>
+    </>
   );
 }

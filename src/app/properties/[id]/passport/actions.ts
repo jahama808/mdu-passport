@@ -40,7 +40,18 @@ export async function importPassportEml(
   await requireUser();
   const db = createServiceClient();
 
-  const { markdown } = emlToMarkdown(input.raw);
+  const { markdown, subject } = emlToMarkdown(input.raw);
+
+  const { error: docError } = await db.from("property_documents").insert({
+    user_id: WORKSPACE_OWNER_ID,
+    property_id: propertyId,
+    kind: "sales_notification",
+    filename: input.filename,
+    subject,
+    content_md: markdown,
+  });
+  if (docError) throw docError;
+
   const extracted = await extractPropertyDetails(markdown);
 
   const filledFields: string[] = [];

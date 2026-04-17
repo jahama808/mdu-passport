@@ -4,6 +4,7 @@ import type {
   CommonAreaEquipment,
   EquipmentType,
   Property,
+  PropertyDocument,
   PropertyNote,
   PropertyScan,
   PropertyScanSession,
@@ -106,6 +107,20 @@ export async function listScanSessions(
     .order("started_at", { ascending: false });
   if (error) throw error;
   return (data ?? []) as PropertyScanSession[];
+}
+
+export async function listPropertyDocuments(
+  propertyId: string,
+): Promise<PropertyDocument[]> {
+  const db = createServiceClient();
+  const { data, error } = await db
+    .from("property_documents")
+    .select("*")
+    .eq("property_id", propertyId)
+    .eq("user_id", WORKSPACE_OWNER_ID)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as PropertyDocument[];
 }
 
 export async function listScansForProperty(
