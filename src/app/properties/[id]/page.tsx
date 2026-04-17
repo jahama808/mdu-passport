@@ -11,6 +11,7 @@ import { titleCase, formatDate, statusColor } from "@/lib/format";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import PropertyCardBody from "@/components/property-card-body";
 import {
   Pencil,
   Plus,
@@ -36,12 +37,6 @@ export default async function PropertyDetailPage({
     listPropertyNotes(id),
     listScanSessions(id),
   ]);
-
-  const counts = {
-    completed: areas.filter((a) => a.installation_status === "completed").length,
-    in_progress: areas.filter((a) => a.installation_status === "in_progress").length,
-    not_started: areas.filter((a) => a.installation_status === "not_started").length,
-  };
 
   return (
     <div className="p-6 space-y-6">
@@ -78,12 +73,11 @@ export default async function PropertyDetailPage({
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-4">
-        <Stat label="Total areas" value={areas.length} />
-        <Stat label="Completed" value={counts.completed} tone="green" />
-        <Stat label="In progress" value={counts.in_progress} tone="amber" />
-        <Stat label="Not started" value={counts.not_started} />
-      </div>
+      <Card>
+        <CardContent className="py-4">
+          <PropertyCardBody property={property} />
+        </CardContent>
+      </Card>
 
       {property.address || property.details?.website ? (
         <Card>
@@ -291,27 +285,3 @@ function displayHost(url: string): string {
   }
 }
 
-function Stat({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: number;
-  tone?: "green" | "amber";
-}) {
-  const color =
-    tone === "green"
-      ? "text-green-700 dark:text-green-400"
-      : tone === "amber"
-        ? "text-amber-700 dark:text-amber-400"
-        : "";
-  return (
-    <Card>
-      <CardContent className="py-3">
-        <div className={`text-2xl font-semibold ${color}`}>{value}</div>
-        <div className="text-xs text-muted-foreground">{label}</div>
-      </CardContent>
-    </Card>
-  );
-}
