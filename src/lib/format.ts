@@ -10,6 +10,9 @@ const ACRONYMS = new Set([
   "poe",
   "sn",
   "mac",
+  "mrc",
+  "po",
+  "id",
 ]);
 
 export function titleCase(s: string): string {

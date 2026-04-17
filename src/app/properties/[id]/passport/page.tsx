@@ -10,6 +10,7 @@ import {
   signedPhotoUrls,
 } from "@/lib/data";
 import { titleCase, formatDateTime } from "@/lib/format";
+import type { PropertyDetails } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,12 @@ export default async function PassportPage({
   const latestPassport = sessions.find((s) => s.passport_md)?.passport_md ?? null;
   const photos = scans.flatMap((s) => s.photo_urls ?? []);
   const signed = await signedPhotoUrls(photos);
+  const details = property.details ?? null;
+  const detailEntries = details
+    ? (Object.entries(details).filter(
+        ([, v]) => typeof v === "string" && v.trim().length > 0,
+      ) as [keyof PropertyDetails, string][])
+    : [];
 
   return (
     <div className="p-6 space-y-6 max-w-4xl">
@@ -54,6 +61,26 @@ export default async function PassportPage({
           </PassportImport>
         </div>
       </div>
+
+      {detailEntries.length > 0 ? (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Details</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <dl className="grid sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+              {detailEntries.map(([key, value]) => (
+                <div key={key}>
+                  <dt className="text-xs uppercase tracking-wide text-muted-foreground">
+                    {titleCase(key)}
+                  </dt>
+                  <dd className="whitespace-pre-wrap">{value}</dd>
+                </div>
+              ))}
+            </dl>
+          </CardContent>
+        </Card>
+      ) : null}
 
       {latestPassport ? (
         <Card>

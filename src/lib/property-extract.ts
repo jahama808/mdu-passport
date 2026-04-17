@@ -1,46 +1,42 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { ISLANDS, PROPERTY_TYPES, type Island, type PropertyType } from "@/lib/types";
+import type { PropertyDetails } from "@/lib/types";
 
-export type ExtractedProperty = {
-  name?: string;
-  type?: PropertyType;
-  address?: string;
-  island?: Island;
-  gm_name?: string;
-  gm_email?: string;
-  notes?: string;
-};
-
-const TOOL_NAME = "record_property_facts";
+const TOOL_NAME = "record_sales_notification";
 
 const tool = {
   name: TOOL_NAME,
   description:
-    "Record any property facts (name, address, GM contact, type, island, notes) you can confidently extract from the email. Omit fields when the email does not clearly state them — do not guess.",
+    "Record sales-notification facts you can confidently extract from the email. Omit fields the email does not state — never guess. Dates should be ISO (YYYY-MM-DD) when possible.",
   input_schema: {
     type: "object" as const,
     properties: {
-      name: { type: "string", description: "Property / building name" },
-      type: { type: "string", enum: PROPERTY_TYPES },
-      address: { type: "string", description: "Full street address" },
-      island: { type: "string", enum: ISLANDS },
-      gm_name: { type: "string", description: "General manager / primary contact name" },
-      gm_email: { type: "string", description: "GM / primary contact email" },
-      notes: {
+      contract_number: { type: "string", description: "Contract, order, or PO number" },
+      customer: { type: "string", description: "Account / customer / property name" },
+      service_type: {
         type: "string",
-        description:
-          "Short free-text notes capturing useful context (project status, scope, deadlines, special requirements). Markdown allowed.",
+        description: "e.g. GigaFiber, MDU Internet, Bulk Internet",
+      },
+      plan_speed: { type: "string", description: "e.g. 1 Gbps, 500/500 Mbps" },
+      num_units: { type: "string", description: "Number of units served" },
+      mrc: { type: "string", description: "Monthly recurring charge, including currency" },
+      contract_start: { type: "string", description: "Contract / service start date" },
+      contract_term: { type: "string", description: "Term length, e.g. 36 months" },
+      install_date: { type: "string", description: "Activation or install date / deadline" },
+      sales_rep: { type: "string", description: "Sales representative name" },
+      account_manager: { type: "string", description: "Account manager name" },
+      scope: {
+        type: "string",
+        description: "Short scope-of-work / project description (markdown allowed)",
       },
     },
     additionalProperties: false,
   },
 };
 
-export async function extractPropertyFromMarkdown(
+export async function extractPropertyDetails(
   markdown: string,
-): Promise<ExtractedProperty> {
+): Promise<PropertyDetails> {
   const client = new Anthropic();
-
   const message = await client.messages.create({
     model: "claude-haiku-4-5-20251001",
     max_tokens: 1024,
@@ -49,12 +45,12 @@ export async function extractPropertyFromMarkdown(
     messages: [
       {
         role: "user",
-        content: `Extract property information from this email. Only include fields the email explicitly supports.\n\n---\n\n${markdown}`,
+        content: `Extract sales-notification fields from this email. Only include fields the email explicitly supports.\n\n---\n\n${markdown}`,
       },
     ],
   });
 
   const toolUse = message.content.find((b) => b.type === "tool_use");
   if (!toolUse || toolUse.type !== "tool_use") return {};
-  return toolUse.input as ExtractedProperty;
+  return toolUse.input as PropertyDetails;
 }

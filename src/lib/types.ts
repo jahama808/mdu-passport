@@ -11,6 +11,21 @@ export type AreaType =
   | "other";
 export type InstallStatus = "not_started" | "in_progress" | "completed";
 
+export type PropertyDetails = {
+  contract_number?: string;
+  customer?: string;
+  service_type?: string;
+  plan_speed?: string;
+  num_units?: string;
+  mrc?: string;
+  contract_start?: string;
+  contract_term?: string;
+  install_date?: string;
+  sales_rep?: string;
+  account_manager?: string;
+  scope?: string;
+};
+
 export type Property = {
   id: string;
   user_id: string;
@@ -22,6 +37,7 @@ export type Property = {
   gm_name: string | null;
   gm_email: string | null;
   notes: string | null;
+  details: PropertyDetails | null;
   created_at: string;
   updated_at: string;
 };

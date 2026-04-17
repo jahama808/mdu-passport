@@ -4,8 +4,8 @@ import { revalidatePath } from "next/cache";
 import { createServiceClient, WORKSPACE_OWNER_ID } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/auth";
 import { emlToMarkdown } from "@/lib/eml";
-import { extractPropertyFromMarkdown } from "@/lib/property-extract";
-import type { Property } from "@/lib/types";
+import { extractPropertyDetails } from "@/lib/property-extract";
+import type { PropertyDetails } from "@/lib/types";
 
 export async function importPassport(
   propertyId: string,
@@ -33,14 +33,6 @@ export type EmlImportResult = {
   skippedFields: string[];
 };
 
-const MERGEABLE_FIELDS = [
-  "address",
-  "island",
-  "gm_name",
-  "gm_email",
-  "notes",
-] as const satisfies readonly (keyof Property)[];
-
 export async function importPassportEml(
   propertyId: string,
   input: { filename: string; raw: string },
@@ -49,41 +41,39 @@ export async function importPassportEml(
   const db = createServiceClient();
 
   const { markdown } = emlToMarkdown(input.raw);
+  const extracted = await extractPropertyDetails(markdown);
 
   const filledFields: string[] = [];
   const skippedFields: string[] = [];
 
-  const extracted = await extractPropertyFromMarkdown(markdown);
+  const { data: current, error: getError } = await db
+    .from("properties")
+    .select("details")
+    .eq("id", propertyId)
+    .eq("user_id", WORKSPACE_OWNER_ID)
+    .single();
+  if (getError) throw getError;
 
-  if (Object.keys(extracted).length > 0) {
-    const { data: current, error: getError } = await db
+  const existing: PropertyDetails = (current?.details as PropertyDetails | null) ?? {};
+  const merged: PropertyDetails = { ...existing };
+
+  for (const [key, value] of Object.entries(extracted)) {
+    if (typeof value !== "string" || value.trim().length === 0) continue;
+    if ((existing as Record<string, unknown>)[key]) {
+      skippedFields.push(key);
+      continue;
+    }
+    (merged as Record<string, string>)[key] = value.trim();
+    filledFields.push(key);
+  }
+
+  if (filledFields.length > 0) {
+    const { error: updateError } = await db
       .from("properties")
-      .select("address,island,gm_name,gm_email,notes")
+      .update({ details: merged })
       .eq("id", propertyId)
-      .eq("user_id", WORKSPACE_OWNER_ID)
-      .single();
-    if (getError) throw getError;
-
-    const patch: Record<string, string> = {};
-    for (const field of MERGEABLE_FIELDS) {
-      const incoming = extracted[field];
-      if (typeof incoming !== "string" || incoming.trim().length === 0) continue;
-      if (current && (current as Record<string, unknown>)[field]) {
-        skippedFields.push(field);
-        continue;
-      }
-      patch[field] = incoming.trim();
-      filledFields.push(field);
-    }
-
-    if (Object.keys(patch).length > 0) {
-      const { error: updateError } = await db
-        .from("properties")
-        .update(patch)
-        .eq("id", propertyId)
-        .eq("user_id", WORKSPACE_OWNER_ID);
-      if (updateError) throw updateError;
-    }
+      .eq("user_id", WORKSPACE_OWNER_ID);
+    if (updateError) throw updateError;
   }
 
   revalidatePath(`/properties/${propertyId}/passport`);
