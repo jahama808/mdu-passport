@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createServiceClient, WORKSPACE_OWNER_ID } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/auth";
 import { emlToMarkdown } from "@/lib/eml";
-import { extractPropertyFromMarkdown, type ExtractedProperty } from "@/lib/property-extract";
+import { extractPropertyFromMarkdown } from "@/lib/property-extract";
 import type { Property } from "@/lib/types";
 
 export async function importPassport(
@@ -48,29 +48,12 @@ export async function importPassportEml(
   await requireUser();
   const db = createServiceClient();
 
-  const { markdown, subject } = emlToMarkdown(input.raw);
-
-  const now = new Date().toISOString();
-  const { error: sessionError } = await db.from("property_scan_sessions").insert({
-    user_id: WORKSPACE_OWNER_ID,
-    property_id: propertyId,
-    started_at: now,
-    ended_at: now,
-    status: "imported",
-    passport_md: markdown,
-    notes: `Imported ${input.filename}${subject ? ` — ${subject}` : ""}`,
-  });
-  if (sessionError) throw sessionError;
+  const { markdown } = emlToMarkdown(input.raw);
 
   const filledFields: string[] = [];
   const skippedFields: string[] = [];
 
-  let extracted: ExtractedProperty = {};
-  try {
-    extracted = await extractPropertyFromMarkdown(markdown);
-  } catch (err) {
-    console.error("eml extraction failed", err);
-  }
+  const extracted = await extractPropertyFromMarkdown(markdown);
 
   if (Object.keys(extracted).length > 0) {
     const { data: current, error: getError } = await db
