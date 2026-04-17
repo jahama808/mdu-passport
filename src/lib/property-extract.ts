@@ -38,12 +38,10 @@ const tool = {
         description: "Contract end / term-end date",
       },
       install_date: { type: "string", description: "Activation or install date / deadline" },
-      account_exec: {
+      account_manager: {
         type: "string",
-        description:
-          "Account executive name (may also appear as 'Sales rep' or 'AE' in the email — return the person's name)",
+        description: "Account Manager name as stated in the email",
       },
-      account_manager: { type: "string", description: "Account manager name" },
       website: {
         type: "string",
         description: "Property or building website URL, if mentioned",
