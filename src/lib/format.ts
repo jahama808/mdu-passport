@@ -89,3 +89,25 @@ export function islandAccentStyle(
 ): React.CSSProperties {
   return { ["--island-accent" as string]: islandAccent(island) } as React.CSSProperties;
 }
+
+export const ISLAND_LABEL: Record<Island, string> = {
+  "kauai":      "Kauaʻi",
+  "oahu":       "Oʻahu",
+  "molokai":    "Molokaʻi",
+  "lanai":      "Lānaʻi",
+  "maui":       "Maui",
+  "big-island": "Hawaiʻi",
+};
+
+export function overallStatus(summary: {
+  total: number;
+  completed: number;
+  in_progress: number;
+  not_started: number;
+}): "completed" | "in_progress" | "not_started" | "mixed" {
+  if (summary.total === 0) return "not_started";
+  if (summary.completed === summary.total) return "completed";
+  if (summary.not_started === summary.total) return "not_started";
+  if (summary.in_progress > 0) return "in_progress";
+  return "mixed";
+}

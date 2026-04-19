@@ -99,6 +99,14 @@
   --island-lanai:      #a65cc9;
   --island-maui:       #f06c6c;
   --island-big-island: #e0451f;
+
+  /* Status */
+  --status-ok:     #00b893;
+  --status-active: #f5a623;
+  --status-idle:   #94a3b8;
+
+  /* Stronger border for hover */
+  --border-strong: #b3c6df;
 }
 
 .dark {
@@ -139,6 +147,11 @@
   --island-lanai:      #c585e3;
   --island-maui:       #ff8585;
   --island-big-island: #ff6a3d;
+
+  --status-ok:         #3cdca8;
+  --status-active:     #f5b84a;
+  --status-idle:       #64748b;
+  --border-strong:     #2c477a;
 }
 
 @layer base {
@@ -258,12 +271,24 @@
 
   .property-card {
     position: relative;
-    border-left: 3px solid var(--island-accent, var(--border));
     overflow: hidden;
+    transition: transform 0.2s ease, border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .property-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--island-accent, var(--border));
   }
 
   .property-card:hover {
+    transform: translateY(-2px);
     border-color: var(--island-accent, var(--border-strong));
+    box-shadow: 0 12px 28px rgba(var(--shadow-color), 0.15);
   }
 
   .property-detail-shell {
@@ -280,6 +305,252 @@
     background: var(--island-accent, var(--border));
     border-radius: 2px;
     opacity: 0.9;
+  }
+
+  .progress-rail {
+    position: relative;
+    height: 26px;
+  }
+
+  .progress-track {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 6px;
+    background: var(--muted);
+    border-radius: 999px;
+  }
+
+  .progress-fill {
+    position: absolute;
+    top: 0;
+    height: 6px;
+    border-radius: 999px;
+    transition: width 0.3s ease;
+  }
+
+  .progress-fill.ok {
+    background: var(--status-ok);
+    left: 0;
+    z-index: 2;
+  }
+
+  .progress-fill.active {
+    background: repeating-linear-gradient(45deg,
+      var(--status-active) 0 6px, #f5b84a 6px 12px);
+    z-index: 1;
+    animation: stripeShift 1s linear infinite;
+  }
+
+  @keyframes stripeShift {
+    to {
+      background-position: 12px 0;
+    }
+  }
+
+  .progress-labels {
+    position: absolute;
+    top: 12px;
+    left: 0;
+    right: 0;
+    display: flex;
+    gap: 0.4rem;
+    color: var(--muted-foreground);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+  }
+
+  .stat-card {
+    position: relative;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.25rem;
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+    transition: border-color 0.15s;
+  }
+
+  .stat-card.stat-accent {
+    border-left: 3px solid var(--brand-cyan);
+  }
+
+  .stat-card.stat-accent::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, rgba(20, 201, 255, 0.20), transparent 70%);
+    transform: translate(35%, -35%);
+    pointer-events: none;
+  }
+
+  .stat-label {
+    color: var(--muted-foreground);
+    text-transform: uppercase;
+    font-weight: 600;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-value {
+    font-family: var(--font-title);
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.01em;
+  }
+
+  .stat-delta {
+    margin-top: 0.45rem;
+    color: var(--muted-foreground);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+  }
+
+  .if-btn {
+    padding: 0.4rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--muted-foreground);
+    font-weight: 500;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    transition: all 0.15s;
+  }
+
+  .if-btn:hover:not(:disabled) {
+    color: var(--foreground);
+    border-color: var(--border-strong);
+  }
+
+  .if-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .if-btn.selected {
+    background: var(--island-accent, var(--brand-blue));
+    border-color: var(--island-accent, var(--brand-blue));
+    color: #fff;
+  }
+
+  .if-count {
+    background: rgba(0, 0, 0, 0.08);
+    padding: 0.05rem 0.4rem;
+    border-radius: 999px;
+    font-size: 0.65rem;
+    font-family: var(--font-mono);
+  }
+
+  .if-btn.selected .if-count {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .view-toggle {
+    display: inline-flex;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) * 0.6);
+    padding: 3px;
+  }
+
+  .vt-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.7rem;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: var(--muted-foreground);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .vt-btn:hover {
+    color: var(--foreground);
+  }
+
+  .vt-btn.selected {
+    background: var(--foreground);
+    color: var(--background);
+  }
+
+  .list-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+  }
+
+  .list-head,
+  .list-row {
+    display: grid;
+    grid-template-columns: 6px 2.2fr 0.9fr 0.7fr 0.5fr 1fr 1.6fr 0.9fr;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.7rem 1rem;
+  }
+
+  .list-head {
+    color: var(--muted-foreground);
+    text-transform: uppercase;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.02);
+  }
+
+  .list-row {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+
+  .list-row:last-child {
+    border-bottom: none;
+  }
+
+  .list-row:hover {
+    background: rgba(20, 201, 255, 0.06);
+  }
+
+  .lr-rail {
+    width: 6px;
+    align-self: stretch;
+    background: var(--island-accent, var(--status-idle));
+    border-radius: 2px;
+  }
+
+  .lr-progress {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+  }
+
+  .lr-progress-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--muted);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .lr-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--brand-blue), var(--brand-cyan));
+    border-radius: 999px;
   }
 }
 
