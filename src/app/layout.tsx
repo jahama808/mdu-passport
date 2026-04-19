@@ -83,7 +83,7 @@ export default async function RootLayout({
         ) : null}
         <main className="flex-1 max-w-7xl w-full mx-auto">{children}</main>
         <footer className="text-center text-xs text-muted-foreground py-4 border-t border-border/60 mt-8">
-          &copy; {new Date().getFullYear()} Hawaiian Telcom · MDU Passport
+          &copy; {new Date().getFullYear()} Koko Crater Labs · MDU Passport
         </footer>
         <Toaster />
       </body>
