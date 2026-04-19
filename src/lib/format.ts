@@ -1,3 +1,6 @@
+import type { Island } from "./types";
+import type React from "react";
+
 const ACRONYMS = new Set([
   "mdu",
   "gm",
@@ -65,4 +68,24 @@ export function statusColor(status: string): string {
     default:
       return "bg-slate-100 text-slate-800 border-slate-300 dark:bg-slate-900/30 dark:text-slate-300";
   }
+}
+
+const ISLAND_ACCENT: Record<Island, string> = {
+  "kauai":      "var(--island-kauai)",
+  "oahu":       "var(--island-oahu)",
+  "molokai":    "var(--island-molokai)",
+  "lanai":      "var(--island-lanai)",
+  "maui":       "var(--island-maui)",
+  "big-island": "var(--island-big-island)",
+};
+
+export function islandAccent(island: Island | null | undefined): string {
+  if (!island) return "var(--border)";
+  return ISLAND_ACCENT[island] ?? "var(--border)";
+}
+
+export function islandAccentStyle(
+  island: Island | null | undefined,
+): React.CSSProperties {
+  return { ["--island-accent" as string]: islandAccent(island) } as React.CSSProperties;
 }

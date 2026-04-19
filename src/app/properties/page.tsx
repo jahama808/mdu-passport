@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSessionContext } from "@/lib/auth";
 import { listProperties } from "@/lib/data";
-import { titleCase } from "@/lib/format";
+import { titleCase, islandAccentStyle } from "@/lib/format";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -34,7 +34,10 @@ export default async function PropertiesPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {properties.map((p) => (
           <Link key={p.id} href={`/properties/${p.id}`}>
-            <Card className="h-full hover:border-foreground/20">
+            <Card
+              className="property-card h-full transition-colors"
+              style={islandAccentStyle(p.island)}
+            >
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center justify-between">
                   <span className="truncate">{p.name}</span>

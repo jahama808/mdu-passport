@@ -91,6 +91,14 @@
   --nav-bg: rgba(250, 252, 255, 0.9);
   --grid-color: rgba(27, 88, 178, 0.08);
   --shadow-color: 15, 70, 150;
+
+  /* Island accents */
+  --island-kauai:      #00a878;
+  --island-oahu:       #14c9ff;
+  --island-molokai:    #d9a441;
+  --island-lanai:      #a65cc9;
+  --island-maui:       #f06c6c;
+  --island-big-island: #e0451f;
 }
 
 .dark {
@@ -123,6 +131,14 @@
   --nav-bg: rgba(15, 26, 49, 0.9);
   --grid-color: rgba(100, 180, 255, 0.06);
   --shadow-color: 0, 0, 0;
+
+  /* Island accents — brighter for dark-mode contrast */
+  --island-kauai:      #23d49d;
+  --island-oahu:       #14c9ff;
+  --island-molokai:    #f0bd5c;
+  --island-lanai:      #c585e3;
+  --island-maui:       #ff8585;
+  --island-big-island: #ff6a3d;
 }
 
 @layer base {
@@ -238,6 +254,32 @@
     background: radial-gradient(circle, rgba(20, 201, 255, 0.20), transparent 70%);
     transform: translate(35%, -35%);
     pointer-events: none;
+  }
+
+  .property-card {
+    position: relative;
+    border-left: 3px solid var(--island-accent, var(--border));
+    overflow: hidden;
+  }
+
+  .property-card:hover {
+    border-color: var(--island-accent, var(--border-strong));
+  }
+
+  .property-detail-shell {
+    position: relative;
+  }
+
+  .property-detail-shell::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--island-accent, var(--border));
+    border-radius: 2px;
+    opacity: 0.9;
   }
 }
 

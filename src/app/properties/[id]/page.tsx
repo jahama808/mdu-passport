@@ -7,7 +7,7 @@ import {
   listPropertyNotes,
   listScanSessions,
 } from "@/lib/data";
-import { titleCase, formatDate, statusColor } from "@/lib/format";
+import { titleCase, formatDate, statusColor, islandAccentStyle } from "@/lib/format";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -41,7 +41,10 @@ export default async function PropertyDetailPage({
   ]);
 
   return (
-    <div className="p-6 space-y-6">
+    <div
+      className="p-6 space-y-6 property-detail-shell"
+      style={islandAccentStyle(property.island)}
+    >
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
           <div className="flex items-center gap-2 flex-wrap">

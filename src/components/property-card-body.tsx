@@ -1,6 +1,6 @@
 import { MapPin, Users, Wifi, UserRound, CalendarClock } from "lucide-react";
 import type { Property } from "@/lib/types";
-import { titleCase, formatDate } from "@/lib/format";
+import { titleCase, formatDate, islandAccent } from "@/lib/format";
 
 function formatMaybeDate(value: string): string {
   const parsed = Date.parse(value);
@@ -12,12 +12,18 @@ export default function PropertyCardBody({ property }: { property: Property }) {
   const details = property.details ?? {};
   const service = [details.service_type, details.plan_speed].filter(Boolean).join(" · ");
 
-  const rows: { icon: React.ReactNode; label: string; value: string }[] = [];
+  const rows: {
+    icon: React.ReactNode;
+    label: string;
+    value: string;
+    labelStyle?: React.CSSProperties;
+  }[] = [];
   if (property.island) {
     rows.push({
       icon: <MapPin className="h-3.5 w-3.5" />,
       label: "Island",
       value: titleCase(property.island),
+      labelStyle: { color: islandAccent(property.island) },
     });
   }
   if (details.billable_units) {
@@ -60,7 +66,10 @@ export default function PropertyCardBody({ property }: { property: Property }) {
         <dl className="space-y-1 text-xs">
           {rows.map((r) => (
             <div key={r.label} className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1 shrink-0 font-medium">
+              <span
+                className="inline-flex items-center gap-1 shrink-0 font-medium"
+                style={r.labelStyle}
+              >
                 {r.icon}
                 {r.label}
               </span>
