@@ -60,7 +60,7 @@ export default async function DashboardPage() {
         ) : null}
       </div>
 
-      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-3">
         <StatCard
           accent
           label="Properties"
@@ -76,11 +76,6 @@ export default async function DashboardPage() {
           label="Billable units"
           value={units.toLocaleString()}
           delta="across six islands"
-        />
-        <StatCard
-          label="Completed areas"
-          value={totals.completed}
-          delta={`${totals.not_started} queued`}
         />
       </div>
 
