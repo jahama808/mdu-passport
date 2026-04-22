@@ -21,6 +21,7 @@ import {
   Download,
   MapPin,
   ExternalLink,
+  FileSpreadsheet,
 } from "lucide-react";
 
 export default async function PropertyDetailPage({
@@ -141,13 +142,22 @@ export default async function PropertyDetailPage({
         <Card>
           <CardHeader className="flex-row items-center justify-between space-y-0">
             <CardTitle className="text-base">Common areas</CardTitle>
-            {canWrite ? (
-              <Link href={`/properties/${id}/common-areas/new`}>
+            <div className="flex items-center gap-2">
+              <Link
+                href={`/api/passport/common-areas-excel?propertyId=${id}`}
+              >
                 <Button size="sm" variant="outline">
-                  <Plus className="h-4 w-4 mr-1" /> Add
+                  <FileSpreadsheet className="h-4 w-4 mr-1" /> Excel report
                 </Button>
               </Link>
-            ) : null}
+              {canWrite ? (
+                <Link href={`/properties/${id}/common-areas/new`}>
+                  <Button size="sm" variant="outline">
+                    <Plus className="h-4 w-4 mr-1" /> Add
+                  </Button>
+                </Link>
+              ) : null}
+            </div>
           </CardHeader>
           <CardContent className="space-y-2">
             {areas.length === 0 ? (
