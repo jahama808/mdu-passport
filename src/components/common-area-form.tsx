@@ -20,6 +20,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Plus, Trash2 } from "lucide-react";
 import {
   AREA_TYPES,
@@ -73,6 +81,8 @@ export default function CommonAreaForm({
     })),
   );
 
+  const [promptOpen, setPromptOpen] = useState(false);
+
   function addRow() {
     setRows((r) => [
       ...r,
@@ -107,28 +117,33 @@ export default function CommonAreaForm({
           equipment: rows.filter((r) => r.equipment_type_id),
         });
         toast.success(area ? "Saved" : "Created");
-        const createAnother = confirm("Create another common area?");
-        if (createAnother) {
-          setForm({
-            area_type: "lobby",
-            area_name: "",
-            description: "",
-            notes: "",
-            installation_status: "not_started",
-            priority: 3,
-            installation_date: "",
-          });
-          setRows([]);
-          router.push(`/properties/${propertyId}/common-areas/new`);
-          router.refresh();
-        } else {
-          router.push(`/properties/${propertyId}`);
-          router.refresh();
-        }
+        setPromptOpen(true);
       } catch (err) {
         toast.error(err instanceof Error ? err.message : "Save failed");
       }
     });
+  }
+
+  function onCreateAnother() {
+    setPromptOpen(false);
+    setForm({
+      area_type: "lobby",
+      area_name: "",
+      description: "",
+      notes: "",
+      installation_status: "not_started",
+      priority: 3,
+      installation_date: "",
+    });
+    setRows([]);
+    router.push(`/properties/${propertyId}/common-areas/new`);
+    router.refresh();
+  }
+
+  function onFinish() {
+    setPromptOpen(false);
+    router.push(`/properties/${propertyId}`);
+    router.refresh();
   }
 
   function onDelete() {
@@ -345,6 +360,31 @@ export default function CommonAreaForm({
           </Button>
         ) : null}
       </div>
+
+      <Dialog
+        open={promptOpen}
+        onOpenChange={(open) => {
+          if (!open) onFinish();
+        }}
+      >
+        <DialogContent showCloseButton={false}>
+          <DialogHeader>
+            <DialogTitle>Create another common area?</DialogTitle>
+            <DialogDescription>
+              Keep going and add another area for this property, or return to
+              the property page.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onFinish}>
+              No
+            </Button>
+            <Button type="button" onClick={onCreateAnother}>
+              Yes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </form>
   );
 }
