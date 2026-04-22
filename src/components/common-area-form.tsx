@@ -94,7 +94,7 @@ export default function CommonAreaForm({
     }
     startTransition(async () => {
       try {
-        const { id } = await saveCommonArea({
+        await saveCommonArea({
           id: area?.id,
           property_id: propertyId,
           area_type: form.area_type,
@@ -107,8 +107,24 @@ export default function CommonAreaForm({
           equipment: rows.filter((r) => r.equipment_type_id),
         });
         toast.success(area ? "Saved" : "Created");
-        router.push(`/properties/${propertyId}/common-areas/${id}`);
-        router.refresh();
+        const createAnother = confirm("Create another common area?");
+        if (createAnother) {
+          setForm({
+            area_type: "lobby",
+            area_name: "",
+            description: "",
+            notes: "",
+            installation_status: "not_started",
+            priority: 3,
+            installation_date: "",
+          });
+          setRows([]);
+          router.push(`/properties/${propertyId}/common-areas/new`);
+          router.refresh();
+        } else {
+          router.push(`/properties/${propertyId}`);
+          router.refresh();
+        }
       } catch (err) {
         toast.error(err instanceof Error ? err.message : "Save failed");
       }
