@@ -188,6 +188,10 @@ export async function GET(req: Request) {
     });
   }
 
+  summary.eachRow({ includeEmpty: false }, (row) => {
+    row.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+  });
+
   // --- Common Areas sheet ---
   const ca = wb.addWorksheet("Common Areas");
   ca.columns = [
