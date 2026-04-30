@@ -7,7 +7,13 @@ import {
   listPropertyNotes,
   listScanSessions,
 } from "@/lib/data";
-import { titleCase, formatDate, statusColor, islandAccentStyle } from "@/lib/format";
+import {
+  titleCase,
+  formatDate,
+  statusColor,
+  islandAccentStyle,
+  formatPhone,
+} from "@/lib/format";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -183,6 +189,13 @@ export default async function PropertyDetailPage({
                     {titleCase(a.area_type)} · priority {a.priority}
                     {a.installation_date ? ` · ${formatDate(a.installation_date)}` : ""}
                   </div>
+                  {a.sublocation || a.btn ? (
+                    <div className="text-xs text-muted-foreground mt-0.5">
+                      {a.sublocation ? `Sublocation: ${a.sublocation}` : ""}
+                      {a.sublocation && a.btn ? " · " : ""}
+                      {a.btn ? `BTN: ${formatPhone(a.btn)}` : ""}
+                    </div>
+                  ) : null}
                 </Link>
               ))
             )}

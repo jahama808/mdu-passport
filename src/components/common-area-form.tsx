@@ -45,6 +45,14 @@ import {
   type EquipmentRow,
 } from "@/app/properties/[id]/common-areas/actions";
 
+function formatPhoneInput(digits: string): string {
+  const d = digits.replace(/\D/g, "").slice(0, 10);
+  if (d.length === 0) return "";
+  if (d.length <= 3) return `(${d}`;
+  if (d.length <= 6) return `(${d.slice(0, 3)}) ${d.slice(3)}`;
+  return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
+}
+
 type Props = {
   propertyId: string;
   area?: CommonArea;
@@ -70,6 +78,8 @@ export default function CommonAreaForm({
     installation_status: area?.installation_status ?? "not_started",
     priority: area?.priority ?? 3,
     installation_date: area?.installation_date ?? "",
+    sublocation: area?.sublocation ?? "",
+    btn: area?.btn ?? "",
   });
 
   const [rows, setRows] = useState<EquipmentRow[]>(() =>
@@ -102,6 +112,10 @@ export default function CommonAreaForm({
       toast.error("Area name is required");
       return;
     }
+    if (form.btn && form.btn.length !== 10) {
+      toast.error("BTN must be exactly 10 digits");
+      return;
+    }
     startTransition(async () => {
       try {
         await saveCommonArea({
@@ -114,6 +128,8 @@ export default function CommonAreaForm({
           installation_status: form.installation_status,
           priority: Number(form.priority),
           installation_date: form.installation_date || null,
+          sublocation: form.sublocation,
+          btn: form.btn,
           equipment: rows.filter((r) => r.equipment_type_id),
         });
         toast.success(area ? "Saved" : "Created");
@@ -134,6 +150,8 @@ export default function CommonAreaForm({
       installation_status: "not_started",
       priority: 3,
       installation_date: "",
+      sublocation: "",
+      btn: "",
     });
     setRows([]);
     router.push(`/properties/${propertyId}/common-areas/new`);
@@ -203,6 +221,31 @@ export default function CommonAreaForm({
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
             />
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label>Sublocation (for fioptics circuit)</Label>
+              <Input
+                value={form.sublocation}
+                onChange={(e) =>
+                  setForm({ ...form, sublocation: e.target.value })
+                }
+                placeholder="xPON ONT location ID"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>BTN (Billing Telephone Number)</Label>
+              <Input
+                inputMode="numeric"
+                maxLength={14}
+                value={formatPhoneInput(form.btn)}
+                onChange={(e) => {
+                  const digits = e.target.value.replace(/\D/g, "").slice(0, 10);
+                  setForm({ ...form, btn: digits });
+                }}
+                placeholder="(555) 123-4567"
+              />
+            </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="space-y-1.5">

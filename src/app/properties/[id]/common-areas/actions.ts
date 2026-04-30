@@ -22,12 +22,18 @@ export type CommonAreaInput = {
   installation_status: string;
   priority: number;
   installation_date?: string | null;
+  sublocation?: string | null;
+  btn?: string | null;
   equipment: EquipmentRow[];
 };
 
 export async function saveCommonArea(input: CommonAreaInput) {
   await requireAdmin();
   const db = createServiceClient();
+  const btnDigits = (input.btn ?? "").replace(/\D/g, "");
+  if (btnDigits && btnDigits.length !== 10) {
+    throw new Error("BTN must be exactly 10 digits");
+  }
   const areaPayload = {
     user_id: WORKSPACE_OWNER_ID,
     property_id: input.property_id,
@@ -38,6 +44,8 @@ export async function saveCommonArea(input: CommonAreaInput) {
     installation_status: input.installation_status,
     priority: input.priority,
     installation_date: input.installation_date || null,
+    sublocation: input.sublocation?.trim() || null,
+    btn: btnDigits || null,
   };
 
   let areaId = input.id;

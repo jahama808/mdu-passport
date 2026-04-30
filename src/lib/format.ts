@@ -99,6 +99,13 @@ export const ISLAND_LABEL: Record<Island, string> = {
   "big-island": "Hawaiʻi",
 };
 
+export function formatPhone(value: string | null | undefined): string {
+  if (!value) return "";
+  const d = value.replace(/\D/g, "").slice(0, 10);
+  if (d.length !== 10) return value;
+  return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
+}
+
 export function overallStatus(summary: {
   total: number;
   completed: number;
