@@ -96,7 +96,7 @@ export async function GET(req: Request) {
     ensureSpace(40);
     line(area.area_name, { size: 12, bold: true, gap: 3 });
     line(
-      `${titleCase(area.area_type)} · ${titleCase(area.installation_status)} · priority ${area.priority}${
+      `${titleCase(area.area_type)} · ${titleCase(area.installation_status)}${
         area.installation_date ? " · " + formatDate(area.installation_date) : ""
       }`,
       { size: 9, gap: 4 },

@@ -20,7 +20,6 @@ export type CommonAreaInput = {
   description?: string | null;
   notes?: string | null;
   installation_status: string;
-  priority: number;
   installation_date?: string | null;
   sublocation?: string | null;
   btn?: string | null;
@@ -42,7 +41,6 @@ export async function saveCommonArea(input: CommonAreaInput) {
     description: input.description?.trim() || null,
     notes: input.notes?.trim() || null,
     installation_status: input.installation_status,
-    priority: input.priority,
     installation_date: input.installation_date || null,
     sublocation: input.sublocation?.trim() || null,
     btn: btnDigits || null,

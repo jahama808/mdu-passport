@@ -64,7 +64,6 @@ export type CommonArea = {
   description: string | null;
   notes: string | null;
   installation_status: InstallStatus;
-  priority: number;
   installation_date: string | null;
   sublocation: string | null;
   btn: string | null;

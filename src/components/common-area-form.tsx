@@ -76,7 +76,6 @@ export default function CommonAreaForm({
     description: area?.description ?? "",
     notes: area?.notes ?? "",
     installation_status: area?.installation_status ?? "not_started",
-    priority: area?.priority ?? 3,
     installation_date: area?.installation_date ?? "",
     sublocation: area?.sublocation ?? "",
     btn: area?.btn ?? "",
@@ -126,7 +125,6 @@ export default function CommonAreaForm({
           description: form.description,
           notes: form.notes,
           installation_status: form.installation_status,
-          priority: Number(form.priority),
           installation_date: form.installation_date || null,
           sublocation: form.sublocation,
           btn: form.btn,
@@ -148,7 +146,6 @@ export default function CommonAreaForm({
       description: "",
       notes: "",
       installation_status: "not_started",
-      priority: 3,
       installation_date: "",
       sublocation: "",
       btn: "",
@@ -247,7 +244,7 @@ export default function CommonAreaForm({
               />
             </div>
           </div>
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label>Status</Label>
               <Select
@@ -267,18 +264,6 @@ export default function CommonAreaForm({
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label>Priority (1-5)</Label>
-              <Input
-                type="number"
-                min={1}
-                max={5}
-                value={form.priority}
-                onChange={(e) =>
-                  setForm({ ...form, priority: Number(e.target.value) })
-                }
-              />
             </div>
             <div className="space-y-1.5">
               <Label>Installation date</Label>

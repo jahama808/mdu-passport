@@ -245,7 +245,6 @@ export async function GET(req: Request) {
         titleCase(area.area_type),
         area.sublocation ? `Sublocation: ${area.sublocation}` : null,
         `Status: ${titleCase(area.installation_status)}`,
-        `Priority: ${area.priority}`,
         area.installation_date
           ? `Installed: ${formatDate(area.installation_date)}`
           : null,

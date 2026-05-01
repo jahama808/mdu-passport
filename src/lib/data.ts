@@ -40,7 +40,6 @@ export async function listCommonAreas(propertyId: string): Promise<CommonArea[]>
     .select("*")
     .eq("property_id", propertyId)
     .eq("user_id", WORKSPACE_OWNER_ID)
-    .order("priority", { ascending: true })
     .order("area_name", { ascending: true });
   if (error) throw error;
   return (data ?? []) as CommonArea[];

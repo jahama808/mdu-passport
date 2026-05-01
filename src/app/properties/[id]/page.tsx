@@ -186,7 +186,7 @@ export default async function PropertyDetailPage({
                     </span>
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    {titleCase(a.area_type)} · priority {a.priority}
+                    {titleCase(a.area_type)}
                     {a.installation_date ? ` · ${formatDate(a.installation_date)}` : ""}
                   </div>
                   {a.sublocation || a.btn ? (
