@@ -47,6 +47,7 @@ export type EquipmentType = {
   id: string;
   user_id: string;
   name: string;
+  item_id: string | null;
   category: string | null;
   manufacturer: string | null;
   model: string | null;

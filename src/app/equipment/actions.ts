@@ -7,6 +7,7 @@ import { requireAdmin } from "@/lib/auth";
 export type EquipmentInput = {
   id?: string;
   name: string;
+  item_id?: string;
   category?: string;
   manufacturer?: string;
   model?: string;
@@ -19,6 +20,7 @@ export async function upsertEquipmentType(input: EquipmentInput) {
   const payload = {
     user_id: WORKSPACE_OWNER_ID,
     name: input.name.trim(),
+    item_id: input.item_id?.trim() || null,
     category: input.category?.trim() || null,
     manufacturer: input.manufacturer?.trim() || null,
     model: input.model?.trim() || null,

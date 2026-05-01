@@ -100,6 +100,7 @@ export default function EquipmentManager({
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
+                  <TableHead>Item ID</TableHead>
                   <TableHead>Category</TableHead>
                   <TableHead>Manufacturer</TableHead>
                   <TableHead>Model</TableHead>
@@ -110,6 +111,7 @@ export default function EquipmentManager({
                 {items.map((e) => (
                   <TableRow key={e.id}>
                     <TableCell className="font-medium">{e.name}</TableCell>
+                    <TableCell>{e.item_id ?? "—"}</TableCell>
                     <TableCell>{e.category ?? "—"}</TableCell>
                     <TableCell>{e.manufacturer ?? "—"}</TableCell>
                     <TableCell>{e.model ?? "—"}</TableCell>
@@ -183,6 +185,7 @@ function EquipmentForm({
   const [pending, startTransition] = useTransition();
   const [form, setForm] = useState({
     name: equipment?.name ?? "",
+    item_id: equipment?.item_id ?? "",
     category: equipment?.category ?? "",
     manufacturer: equipment?.manufacturer ?? "",
     model: equipment?.model ?? "",
@@ -215,6 +218,14 @@ function EquipmentForm({
             required
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label>Item ID</Label>
+          <Input
+            value={form.item_id}
+            onChange={(e) => setForm({ ...form, item_id: e.target.value })}
+            placeholder="SKU, asset tag, part number…"
           />
         </div>
         <div className="grid grid-cols-2 gap-3">

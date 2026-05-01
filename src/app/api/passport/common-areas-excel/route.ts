@@ -53,12 +53,13 @@ export async function GET(req: Request) {
     { key: "a", width: 36 },
     { key: "b", width: 18 },
     { key: "c", width: 18 },
-    { key: "d", width: 28 },
+    { key: "d", width: 18 },
+    { key: "e", width: 28 },
   ];
 
   const titleRow = summary.addRow([property.name]);
   titleRow.font = { size: 18, bold: true };
-  summary.mergeCells(`A${titleRow.number}:D${titleRow.number}`);
+  summary.mergeCells(`A${titleRow.number}:E${titleRow.number}`);
 
   const subtitleRow = summary.addRow([
     [
@@ -70,11 +71,11 @@ export async function GET(req: Request) {
       .join(" · "),
   ]);
   subtitleRow.font = { size: 11, color: { argb: "FF555555" } };
-  summary.mergeCells(`A${subtitleRow.number}:D${subtitleRow.number}`);
+  summary.mergeCells(`A${subtitleRow.number}:E${subtitleRow.number}`);
 
   const dateRow = summary.addRow([`Report generated: ${generatedLabel}`]);
   dateRow.font = { size: 10, italic: true, color: { argb: "FF777777" } };
-  summary.mergeCells(`A${dateRow.number}:D${dateRow.number}`);
+  summary.mergeCells(`A${dateRow.number}:E${dateRow.number}`);
 
   summary.addRow([]);
 
@@ -89,7 +90,7 @@ export async function GET(req: Request) {
   };
   const areasHeader = summary.addRow(["Common Areas Overview"]);
   areasHeader.font = { size: 13, bold: true };
-  summary.mergeCells(`A${areasHeader.number}:D${areasHeader.number}`);
+  summary.mergeCells(`A${areasHeader.number}:E${areasHeader.number}`);
 
   const areaStatsHeader = summary.addRow([
     "Total",
@@ -121,7 +122,13 @@ export async function GET(req: Request) {
   // Equipment totals across all areas
   const equipmentTotals = new Map<
     string,
-    { name: string; model: string | null; category: string | null; qty: number }
+    {
+      name: string;
+      item_id: string | null;
+      model: string | null;
+      category: string | null;
+      qty: number;
+    }
   >();
   for (const area of areas) {
     const rows = equipmentByArea[area.id] ?? [];
@@ -134,6 +141,7 @@ export async function GET(req: Request) {
       } else {
         equipmentTotals.set(key, {
           name: et?.name ?? "(unknown)",
+          item_id: et?.item_id ?? null,
           model: et?.model ?? null,
           category: et?.category ?? null,
           qty: r.quantity,
@@ -148,10 +156,11 @@ export async function GET(req: Request) {
 
   const equipHeader = summary.addRow(["Equipment Totals (All Common Areas)"]);
   equipHeader.font = { size: 13, bold: true };
-  summary.mergeCells(`A${equipHeader.number}:D${equipHeader.number}`);
+  summary.mergeCells(`A${equipHeader.number}:E${equipHeader.number}`);
 
   const equipColsHeader = summary.addRow([
     "Equipment",
+    "Item ID",
     "Model",
     "Category",
     "Quantity",
@@ -172,14 +181,20 @@ export async function GET(req: Request) {
   if (equipmentSorted.length === 0) {
     const emptyRow = summary.addRow(["No equipment recorded yet."]);
     emptyRow.font = { italic: true, color: { argb: "FF888888" } };
-    summary.mergeCells(`A${emptyRow.number}:D${emptyRow.number}`);
+    summary.mergeCells(`A${emptyRow.number}:E${emptyRow.number}`);
   } else {
     let grand = 0;
     for (const item of equipmentSorted) {
-      summary.addRow([item.name, item.model ?? "—", item.category ?? "—", item.qty]);
+      summary.addRow([
+        item.name,
+        item.item_id ?? "—",
+        item.model ?? "—",
+        item.category ?? "—",
+        item.qty,
+      ]);
       grand += item.qty;
     }
-    const totalRow = summary.addRow(["", "", "Total", grand]);
+    const totalRow = summary.addRow(["", "", "", "Total", grand]);
     totalRow.font = { bold: true };
     totalRow.eachCell((cell) => {
       cell.border = {
@@ -196,33 +211,34 @@ export async function GET(req: Request) {
   const ca = wb.addWorksheet("Common Areas");
   ca.columns = [
     { key: "a", width: 30 },
-    { key: "b", width: 22 },
-    { key: "c", width: 18 },
-    { key: "d", width: 10 },
-    { key: "e", width: 14 },
-    { key: "f", width: 40 },
+    { key: "b", width: 18 },
+    { key: "c", width: 22 },
+    { key: "d", width: 18 },
+    { key: "e", width: 10 },
+    { key: "f", width: 14 },
+    { key: "g", width: 40 },
   ];
 
   const caTitle = ca.addRow([property.name]);
   caTitle.font = { size: 18, bold: true };
-  ca.mergeCells(`A${caTitle.number}:F${caTitle.number}`);
+  ca.mergeCells(`A${caTitle.number}:G${caTitle.number}`);
 
   const caSub = ca.addRow([`Report generated: ${generatedLabel}`]);
   caSub.font = { size: 10, italic: true, color: { argb: "FF777777" } };
-  ca.mergeCells(`A${caSub.number}:F${caSub.number}`);
+  ca.mergeCells(`A${caSub.number}:G${caSub.number}`);
 
   ca.addRow([]);
 
   if (areas.length === 0) {
     const empty = ca.addRow(["No common areas on file."]);
     empty.font = { italic: true, color: { argb: "FF888888" } };
-    ca.mergeCells(`A${empty.number}:F${empty.number}`);
+    ca.mergeCells(`A${empty.number}:G${empty.number}`);
   }
 
   for (const area of areas) {
     const nameRow = ca.addRow([area.area_name]);
     nameRow.font = { size: 13, bold: true };
-    ca.mergeCells(`A${nameRow.number}:F${nameRow.number}`);
+    ca.mergeCells(`A${nameRow.number}:G${nameRow.number}`);
 
     const metaRow = ca.addRow([
       [
@@ -237,18 +253,19 @@ export async function GET(req: Request) {
         .join(" · "),
     ]);
     metaRow.font = { size: 10, color: { argb: "FF555555" } };
-    ca.mergeCells(`A${metaRow.number}:F${metaRow.number}`);
+    ca.mergeCells(`A${metaRow.number}:G${metaRow.number}`);
 
     if (area.description) {
       const descRow = ca.addRow([area.description]);
       descRow.font = { size: 10, italic: true };
       descRow.alignment = { wrapText: true, vertical: "top" };
-      ca.mergeCells(`A${descRow.number}:F${descRow.number}`);
+      ca.mergeCells(`A${descRow.number}:G${descRow.number}`);
     }
 
     const rows = equipmentByArea[area.id] ?? [];
     const header = ca.addRow([
       "Equipment",
+      "Item ID",
       "Manufacturer",
       "Model",
       "Qty",
@@ -271,13 +288,14 @@ export async function GET(req: Request) {
     if (rows.length === 0) {
       const none = ca.addRow(["No equipment recorded for this area."]);
       none.font = { italic: true, color: { argb: "FF888888" } };
-      ca.mergeCells(`A${none.number}:F${none.number}`);
+      ca.mergeCells(`A${none.number}:G${none.number}`);
     } else {
       let areaTotal = 0;
       for (const r of rows) {
         const et = equipmentIndex.get(r.equipment_type_id);
         ca.addRow([
           et?.name ?? "(unknown)",
+          et?.item_id ?? "—",
           et?.manufacturer ?? "—",
           et?.model ?? "—",
           r.quantity,
@@ -286,7 +304,7 @@ export async function GET(req: Request) {
         ]);
         areaTotal += r.quantity;
       }
-      const subtotal = ca.addRow(["", "", "Subtotal", areaTotal, "", ""]);
+      const subtotal = ca.addRow(["", "", "", "Subtotal", areaTotal, "", ""]);
       subtotal.font = { bold: true };
       subtotal.eachCell((cell) => {
         cell.border = {
@@ -301,7 +319,7 @@ export async function GET(req: Request) {
       const notes = ca.addRow([area.notes]);
       notes.font = { size: 10 };
       notes.alignment = { wrapText: true, vertical: "top" };
-      ca.mergeCells(`A${notes.number}:F${notes.number}`);
+      ca.mergeCells(`A${notes.number}:G${notes.number}`);
     }
 
     ca.addRow([]);
