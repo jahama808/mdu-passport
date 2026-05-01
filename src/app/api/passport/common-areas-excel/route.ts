@@ -243,6 +243,7 @@ export async function GET(req: Request) {
     const metaRow = ca.addRow([
       [
         titleCase(area.area_type),
+        area.sublocation ? `Sublocation: ${area.sublocation}` : null,
         `Status: ${titleCase(area.installation_status)}`,
         `Priority: ${area.priority}`,
         area.installation_date
