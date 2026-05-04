@@ -7,7 +7,7 @@ import {
   listCommonAreas,
   listEquipmentTypes,
 } from "@/lib/data";
-import { titleCase, formatDate } from "@/lib/format";
+import { titleCase, formatDate, formatPhone } from "@/lib/format";
 
 export async function GET(req: Request) {
   await requireUser();
@@ -244,6 +244,7 @@ export async function GET(req: Request) {
       [
         titleCase(area.area_type),
         area.sublocation ? `Sublocation: ${area.sublocation}` : null,
+        area.btn ? `BTN: ${formatPhone(area.btn)}` : null,
         `Status: ${titleCase(area.installation_status)}`,
         area.installation_date
           ? `Installed: ${formatDate(area.installation_date)}`
