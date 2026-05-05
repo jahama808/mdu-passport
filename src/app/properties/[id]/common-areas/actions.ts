@@ -111,6 +111,109 @@ export async function saveCommonArea(input: CommonAreaInput) {
   return { id: areaId! };
 }
 
+export type CsvRowInput = {
+  rowNum: number;
+  area_name: string;
+  sublocation: string;
+  btn: string;
+};
+
+export type BatchUpsertResult = {
+  created: number;
+  updated: number;
+  errors: { rowNum: number; area_name: string; message: string }[];
+};
+
+export async function batchUpsertCommonAreasFromCsv(
+  propertyId: string,
+  rows: CsvRowInput[],
+): Promise<BatchUpsertResult> {
+  await requireAdmin();
+  const db = createServiceClient();
+
+  const { data: existing, error: readErr } = await db
+    .from("common_areas")
+    .select("id, area_name")
+    .eq("property_id", propertyId)
+    .eq("user_id", WORKSPACE_OWNER_ID);
+  if (readErr) throw readErr;
+
+  const byName = new Map<string, string>();
+  for (const a of existing ?? []) {
+    byName.set((a.area_name as string).trim().toLowerCase(), a.id as string);
+  }
+
+  const result: BatchUpsertResult = { created: 0, updated: 0, errors: [] };
+
+  for (const row of rows) {
+    const name = row.area_name.trim();
+    if (!name) {
+      result.errors.push({
+        rowNum: row.rowNum,
+        area_name: "",
+        message: "Device Name is required",
+      });
+      continue;
+    }
+    const btnDigits = (row.btn ?? "").replace(/\D/g, "");
+    if (btnDigits && btnDigits.length !== 10) {
+      result.errors.push({
+        rowNum: row.rowNum,
+        area_name: name,
+        message: "BTN must be exactly 10 digits",
+      });
+      continue;
+    }
+    const sublocation = row.sublocation?.trim() || null;
+    const btn = btnDigits || null;
+    const existingId = byName.get(name.toLowerCase());
+
+    if (existingId) {
+      const { error } = await db
+        .from("common_areas")
+        .update({ sublocation, btn })
+        .eq("id", existingId)
+        .eq("user_id", WORKSPACE_OWNER_ID);
+      if (error) {
+        result.errors.push({
+          rowNum: row.rowNum,
+          area_name: name,
+          message: error.message,
+        });
+      } else {
+        result.updated++;
+      }
+    } else {
+      const { data, error } = await db
+        .from("common_areas")
+        .insert({
+          user_id: WORKSPACE_OWNER_ID,
+          property_id: propertyId,
+          area_type: "other",
+          area_name: name,
+          installation_status: "not_started",
+          sublocation,
+          btn,
+        })
+        .select("id")
+        .single();
+      if (error) {
+        result.errors.push({
+          rowNum: row.rowNum,
+          area_name: name,
+          message: error.message,
+        });
+      } else {
+        result.created++;
+        byName.set(name.toLowerCase(), data.id as string);
+      }
+    }
+  }
+
+  revalidatePath(`/properties/${propertyId}`);
+  return result;
+}
+
 export async function deleteCommonArea(propertyId: string, id: string) {
   await requireAdmin();
   const db = createServiceClient();

@@ -28,6 +28,7 @@ import {
   MapPin,
   ExternalLink,
   FileSpreadsheet,
+  Upload,
 } from "lucide-react";
 
 export default async function PropertyDetailPage({
@@ -157,11 +158,18 @@ export default async function PropertyDetailPage({
                 </Button>
               </Link>
               {canWrite ? (
-                <Link href={`/properties/${id}/common-areas/new`}>
-                  <Button size="sm" variant="outline">
-                    <Plus className="h-4 w-4 mr-1" /> Add
-                  </Button>
-                </Link>
+                <>
+                  <Link href={`/properties/${id}/common-areas/upload`}>
+                    <Button size="sm" variant="outline">
+                      <Upload className="h-4 w-4 mr-1" /> Upload CSV
+                    </Button>
+                  </Link>
+                  <Link href={`/properties/${id}/common-areas/new`}>
+                    <Button size="sm" variant="outline">
+                      <Plus className="h-4 w-4 mr-1" /> Add
+                    </Button>
+                  </Link>
+                </>
               ) : null}
             </div>
           </CardHeader>
