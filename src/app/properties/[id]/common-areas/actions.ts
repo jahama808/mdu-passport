@@ -146,7 +146,7 @@ export async function batchUpsertCommonAreasFromCsv(
   const result: BatchUpsertResult = { created: 0, updated: 0, errors: [] };
 
   for (const row of rows) {
-    const name = row.area_name.trim();
+    const name = row.area_name.trim().toUpperCase();
     if (!name) {
       result.errors.push({
         rowNum: row.rowNum,
@@ -171,7 +171,7 @@ export async function batchUpsertCommonAreasFromCsv(
     if (existingId) {
       const { error } = await db
         .from("common_areas")
-        .update({ sublocation, btn })
+        .update({ area_name: name, sublocation, btn })
         .eq("id", existingId)
         .eq("user_id", WORKSPACE_OWNER_ID);
       if (error) {

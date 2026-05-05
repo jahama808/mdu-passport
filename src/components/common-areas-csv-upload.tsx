@@ -110,20 +110,17 @@ export default function CommonAreasCsvUpload({
       toast.error("CSV is empty");
       return;
     }
-    const headerCells = grid[0].map((c) => c.trim().toLowerCase());
-    const expected = ["device name", "sublocation", "btn"];
-    const hasHeader = expected.every((h, idx) => headerCells[idx] === h);
-    const dataRows = hasHeader ? grid.slice(1) : grid;
+    const dataRows = grid.slice(1);
     const parsed: ParsedRow[] = dataRows.map((cells, idx) => {
       const [device, sub, btn] = cells;
-      const name = (device ?? "").trim();
+      const name = (device ?? "").trim().toUpperCase();
       const btnDigits = (btn ?? "").replace(/\D/g, "");
       let error: string | undefined;
       if (!name) error = "Device Name is empty";
       else if (btnDigits && btnDigits.length !== 10)
         error = "BTN must be exactly 10 digits";
       return {
-        rowNum: hasHeader ? idx + 2 : idx + 1,
+        rowNum: idx + 2,
         area_name: name,
         sublocation: (sub ?? "").trim(),
         btn: (btn ?? "").trim(),
@@ -188,10 +185,12 @@ export default function CommonAreasCsvUpload({
             Upload a .csv with three columns:{" "}
             <code className="text-foreground">Device Name</code>,{" "}
             <code className="text-foreground">Sublocation</code>,{" "}
-            <code className="text-foreground">BTN</code>.
+            <code className="text-foreground">BTN</code>. The first row is
+            treated as the header and skipped.
           </p>
           <p>
-            Rows that match an existing common area (by Device Name) will have
+            Device Names are normalized to ALL CAPS. Rows that match an
+            existing common area (case-insensitive by Device Name) will have
             their Sublocation and BTN updated. Unmatched rows are created as
             new common areas with type &quot;Other&quot; and status &quot;Not
             started&quot; — you can edit them afterward.
