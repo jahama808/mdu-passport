@@ -207,124 +207,144 @@ export async function GET(req: Request) {
     row.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
   });
 
-  // --- Common Areas sheet ---
-  const ca = wb.addWorksheet("Common Areas");
-  ca.columns = [
-    { key: "a", width: 30 },
-    { key: "b", width: 18 },
-    { key: "c", width: 22 },
-    { key: "d", width: 18 },
-    { key: "e", width: 10 },
-    { key: "f", width: 14 },
-    { key: "g", width: 40 },
-  ];
+  // --- Common Areas sheet(s) ---
+  const buildAreasSheet = (
+    name: string,
+    orderedAreas: typeof areas,
+  ) => {
+    const ws = wb.addWorksheet(name);
+    ws.columns = [
+      { key: "a", width: 30 },
+      { key: "b", width: 18 },
+      { key: "c", width: 22 },
+      { key: "d", width: 18 },
+      { key: "e", width: 10 },
+      { key: "f", width: 14 },
+      { key: "g", width: 40 },
+    ];
 
-  const caTitle = ca.addRow([property.name]);
-  caTitle.font = { size: 18, bold: true };
-  ca.mergeCells(`A${caTitle.number}:G${caTitle.number}`);
+    const titleRow = ws.addRow([property.name]);
+    titleRow.font = { size: 18, bold: true };
+    ws.mergeCells(`A${titleRow.number}:G${titleRow.number}`);
 
-  const caSub = ca.addRow([`Report generated: ${generatedLabel}`]);
-  caSub.font = { size: 10, italic: true, color: { argb: "FF777777" } };
-  ca.mergeCells(`A${caSub.number}:G${caSub.number}`);
+    const subRow = ws.addRow([`Report generated: ${generatedLabel}`]);
+    subRow.font = { size: 10, italic: true, color: { argb: "FF777777" } };
+    ws.mergeCells(`A${subRow.number}:G${subRow.number}`);
 
-  ca.addRow([]);
+    ws.addRow([]);
 
-  if (areas.length === 0) {
-    const empty = ca.addRow(["No common areas on file."]);
-    empty.font = { italic: true, color: { argb: "FF888888" } };
-    ca.mergeCells(`A${empty.number}:G${empty.number}`);
-  }
-
-  for (const area of areas) {
-    const nameRow = ca.addRow([area.area_name]);
-    nameRow.font = { size: 13, bold: true };
-    ca.mergeCells(`A${nameRow.number}:G${nameRow.number}`);
-
-    const metaRow = ca.addRow([
-      [
-        titleCase(area.area_type),
-        area.sublocation ? `Sublocation: ${area.sublocation}` : null,
-        area.btn ? `BTN: ${formatPhone(area.btn)}` : null,
-        `Status: ${titleCase(area.installation_status)}`,
-        area.installation_date
-          ? `Installed: ${formatDate(area.installation_date)}`
-          : null,
-      ]
-        .filter(Boolean)
-        .join(" · "),
-    ]);
-    metaRow.font = { size: 10, color: { argb: "FF555555" } };
-    ca.mergeCells(`A${metaRow.number}:G${metaRow.number}`);
-
-    if (area.description) {
-      const descRow = ca.addRow([area.description]);
-      descRow.font = { size: 10, italic: true };
-      descRow.alignment = { wrapText: true, vertical: "top" };
-      ca.mergeCells(`A${descRow.number}:G${descRow.number}`);
+    if (orderedAreas.length === 0) {
+      const empty = ws.addRow(["No common areas on file."]);
+      empty.font = { italic: true, color: { argb: "FF888888" } };
+      ws.mergeCells(`A${empty.number}:G${empty.number}`);
+      return ws;
     }
 
-    const rows = equipmentByArea[area.id] ?? [];
-    const header = ca.addRow([
-      "Equipment",
-      "Item ID",
-      "Manufacturer",
-      "Model",
-      "Qty",
-      "Category",
-      "Notes",
-    ]);
-    header.font = { bold: true };
-    header.eachCell((cell) => {
-      cell.fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: "FFEFEFEF" },
-      };
-      cell.border = {
-        top: { style: "thin", color: { argb: "FFCCCCCC" } },
-        bottom: { style: "thin", color: { argb: "FFCCCCCC" } },
-      };
-    });
+    for (const area of orderedAreas) {
+      const nameRow = ws.addRow([area.area_name]);
+      nameRow.font = { size: 13, bold: true };
+      ws.mergeCells(`A${nameRow.number}:G${nameRow.number}`);
 
-    if (rows.length === 0) {
-      const none = ca.addRow(["No equipment recorded for this area."]);
-      none.font = { italic: true, color: { argb: "FF888888" } };
-      ca.mergeCells(`A${none.number}:G${none.number}`);
-    } else {
-      let areaTotal = 0;
-      for (const r of rows) {
-        const et = equipmentIndex.get(r.equipment_type_id);
-        ca.addRow([
-          et?.name ?? "(unknown)",
-          et?.item_id ?? "—",
-          et?.manufacturer ?? "—",
-          et?.model ?? "—",
-          r.quantity,
-          et?.category ?? "—",
-          r.notes ?? "",
-        ]);
-        areaTotal += r.quantity;
+      const metaRow = ws.addRow([
+        [
+          titleCase(area.area_type),
+          area.sublocation ? `Sublocation: ${area.sublocation}` : null,
+          area.btn ? `BTN: ${formatPhone(area.btn)}` : null,
+          `Status: ${titleCase(area.installation_status)}`,
+          area.installation_date
+            ? `Installed: ${formatDate(area.installation_date)}`
+            : null,
+        ]
+          .filter(Boolean)
+          .join(" · "),
+      ]);
+      metaRow.font = { size: 10, color: { argb: "FF555555" } };
+      ws.mergeCells(`A${metaRow.number}:G${metaRow.number}`);
+
+      if (area.description) {
+        const descRow = ws.addRow([area.description]);
+        descRow.font = { size: 10, italic: true };
+        descRow.alignment = { wrapText: true, vertical: "top" };
+        ws.mergeCells(`A${descRow.number}:G${descRow.number}`);
       }
-      const subtotal = ca.addRow(["", "", "", "Subtotal", areaTotal, "", ""]);
-      subtotal.font = { bold: true };
-      subtotal.eachCell((cell) => {
+
+      const rows = equipmentByArea[area.id] ?? [];
+      const header = ws.addRow([
+        "Equipment",
+        "Item ID",
+        "Manufacturer",
+        "Model",
+        "Qty",
+        "Category",
+        "Notes",
+      ]);
+      header.font = { bold: true };
+      header.eachCell((cell) => {
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FFEFEFEF" },
+        };
         cell.border = {
           top: { style: "thin", color: { argb: "FFCCCCCC" } },
+          bottom: { style: "thin", color: { argb: "FFCCCCCC" } },
         };
       });
+
+      if (rows.length === 0) {
+        const none = ws.addRow(["No equipment recorded for this area."]);
+        none.font = { italic: true, color: { argb: "FF888888" } };
+        ws.mergeCells(`A${none.number}:G${none.number}`);
+      } else {
+        let areaTotal = 0;
+        for (const r of rows) {
+          const et = equipmentIndex.get(r.equipment_type_id);
+          ws.addRow([
+            et?.name ?? "(unknown)",
+            et?.item_id ?? "—",
+            et?.manufacturer ?? "—",
+            et?.model ?? "—",
+            r.quantity,
+            et?.category ?? "—",
+            r.notes ?? "",
+          ]);
+          areaTotal += r.quantity;
+        }
+        const subtotal = ws.addRow(["", "", "", "Subtotal", areaTotal, "", ""]);
+        subtotal.font = { bold: true };
+        subtotal.eachCell((cell) => {
+          cell.border = {
+            top: { style: "thin", color: { argb: "FFCCCCCC" } },
+          };
+        });
+      }
+
+      if (area.notes) {
+        const notesLabel = ws.addRow(["Notes"]);
+        notesLabel.font = { bold: true, size: 10 };
+        const notes = ws.addRow([area.notes]);
+        notes.font = { size: 10 };
+        notes.alignment = { wrapText: true, vertical: "top" };
+        ws.mergeCells(`A${notes.number}:G${notes.number}`);
+      }
+
+      ws.addRow([]);
     }
 
-    if (area.notes) {
-      const notesLabel = ca.addRow(["Notes"]);
-      notesLabel.font = { bold: true, size: 10 };
-      const notes = ca.addRow([area.notes]);
-      notes.font = { size: 10 };
-      notes.alignment = { wrapText: true, vertical: "top" };
-      ca.mergeCells(`A${notes.number}:G${notes.number}`);
-    }
+    return ws;
+  };
 
-    ca.addRow([]);
-  }
+  buildAreasSheet("Common Areas", areas);
+
+  const areasBySublocation = [...areas].sort((a, b) => {
+    const sa = (a.sublocation ?? "").toLocaleLowerCase();
+    const sb = (b.sublocation ?? "").toLocaleLowerCase();
+    if (sa && !sb) return -1;
+    if (!sa && sb) return 1;
+    if (sa !== sb) return sa.localeCompare(sb);
+    return a.area_name.localeCompare(b.area_name);
+  });
+  buildAreasSheet("By Sublocation", areasBySublocation);
 
   const buffer = await wb.xlsx.writeBuffer();
   const dateSuffix = generatedAt.toISOString().slice(0, 10);
