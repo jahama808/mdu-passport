@@ -100,6 +100,17 @@ export type PropertyDocument = {
   created_at: string;
 };
 
+export type PropertyImage = {
+  id: string;
+  user_id: string;
+  property_id: string;
+  storage_path: string;
+  filename: string;
+  content_type: string;
+  note: string | null;
+  created_at: string;
+};
+
 export type PropertyScanSession = {
   id: string;
   user_id: string;

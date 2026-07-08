@@ -4,8 +4,11 @@ import { getSessionContext } from "@/lib/auth";
 import {
   getProperty,
   listCommonAreas,
+  listPropertyImages,
   listPropertyNotes,
   listScanSessions,
+  signedPhotoUrls,
+  PROPERTY_IMAGES_BUCKET,
 } from "@/lib/data";
 import {
   titleCase,
@@ -18,6 +21,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import PropertyCardBody from "@/components/property-card-body";
+import PropertyImages from "@/components/property-images";
 import {
   Pencil,
   Plus,
@@ -42,11 +46,20 @@ export default async function PropertyDetailPage({
   const { id } = await params;
   const property = await getProperty(id);
   if (!property) notFound();
-  const [areas, notes, sessions] = await Promise.all([
+  const [areas, notes, sessions, images] = await Promise.all([
     listCommonAreas(id),
     listPropertyNotes(id),
     listScanSessions(id),
+    listPropertyImages(id),
   ]);
+  const signed = await signedPhotoUrls(
+    images.map((img) => img.storage_path),
+    PROPERTY_IMAGES_BUCKET,
+  );
+  const imagesWithUrls = images.map((img) => ({
+    ...img,
+    url: signed[img.storage_path] ?? null,
+  }));
 
   return (
     <div
@@ -213,37 +226,15 @@ export default async function PropertyDetailPage({
         <Card>
           <CardHeader className="flex-row items-center justify-between space-y-0">
             <CardTitle className="text-base flex items-center gap-2">
-              <Camera className="h-4 w-4" /> Scan sessions
+              <Camera className="h-4 w-4" /> Images
             </CardTitle>
-            <Link href={`/properties/${id}/scans`}>
-              <Button size="sm" variant="outline">
-                View all
-              </Button>
-            </Link>
           </CardHeader>
-          <CardContent className="space-y-2">
-            {sessions.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                No walkthrough sessions yet.
-              </p>
-            ) : (
-              sessions.slice(0, 5).map((s) => (
-                <div
-                  key={s.id}
-                  className="border rounded-md px-3 py-2 text-sm"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">{formatDate(s.started_at)}</span>
-                    <Badge variant="outline">{s.status}</Badge>
-                  </div>
-                  {s.notes ? (
-                    <div className="text-xs text-muted-foreground mt-1 truncate">
-                      {s.notes}
-                    </div>
-                  ) : null}
-                </div>
-              ))
-            )}
+          <CardContent>
+            <PropertyImages
+              propertyId={id}
+              images={imagesWithUrls}
+              canWrite={canWrite}
+            />
           </CardContent>
         </Card>
 

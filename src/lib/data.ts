@@ -5,10 +5,14 @@ import type {
   EquipmentType,
   Property,
   PropertyDocument,
+  PropertyImage,
   PropertyNote,
   PropertyScan,
   PropertyScanSession,
 } from "@/lib/types";
+
+export const PROPERTY_IMAGES_BUCKET =
+  process.env.SUPABASE_IMAGES_BUCKET ?? "property-images";
 
 export async function listProperties(): Promise<Property[]> {
   const db = createServiceClient();
@@ -27,6 +31,24 @@ export async function getProperty(id: string): Promise<Property | null> {
     .from("properties")
     .select("*")
     .eq("id", id)
+    .eq("user_id", WORKSPACE_OWNER_ID)
+    .maybeSingle();
+  if (error) throw error;
+  return (data as Property) ?? null;
+}
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export async function getPropertyByIdOrSlug(
+  idOrSlug: string,
+): Promise<Property | null> {
+  if (UUID_RE.test(idOrSlug)) return getProperty(idOrSlug);
+  const db = createServiceClient();
+  const { data, error } = await db
+    .from("properties")
+    .select("*")
+    .eq("slug", idOrSlug)
     .eq("user_id", WORKSPACE_OWNER_ID)
     .maybeSingle();
   if (error) throw error;
@@ -120,6 +142,20 @@ export async function listPropertyDocuments(
     .order("created_at", { ascending: false });
   if (error) throw error;
   return (data ?? []) as PropertyDocument[];
+}
+
+export async function listPropertyImages(
+  propertyId: string,
+): Promise<PropertyImage[]> {
+  const db = createServiceClient();
+  const { data, error } = await db
+    .from("property_images")
+    .select("*")
+    .eq("property_id", propertyId)
+    .eq("user_id", WORKSPACE_OWNER_ID)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as PropertyImage[];
 }
 
 export async function listScansForProperty(
