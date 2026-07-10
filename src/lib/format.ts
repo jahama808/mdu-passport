@@ -70,6 +70,22 @@ export function statusColor(status: string): string {
   }
 }
 
+export function projectStatusColor(status: string): string {
+  if (status === "open") {
+    return "bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-900/30 dark:text-blue-300";
+  }
+  return statusColor(status);
+}
+
+export function isOverdue(
+  dueDate: string | null | undefined,
+  status: string,
+): boolean {
+  if (!dueDate || status === "completed") return false;
+  const due = new Date(`${dueDate}T23:59:59`);
+  return !Number.isNaN(due.getTime()) && due < new Date();
+}
+
 const ISLAND_ACCENT: Record<Island, string> = {
   "kauai":      "var(--island-kauai)",
   "oahu":       "var(--island-oahu)",

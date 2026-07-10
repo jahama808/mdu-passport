@@ -3,10 +3,12 @@ import type {
   CommonArea,
   CommonAreaEquipment,
   EquipmentType,
+  ProjectNote,
   Property,
   PropertyDocument,
   PropertyImage,
   PropertyNote,
+  PropertyProject,
   PropertyScan,
   PropertyScanSession,
 } from "@/lib/types";
@@ -170,6 +172,59 @@ export async function listScansForProperty(
     .order("captured_at", { ascending: true });
   if (error) throw error;
   return (data ?? []) as PropertyScan[];
+}
+
+export async function listProjects(propertyId: string): Promise<PropertyProject[]> {
+  const db = createServiceClient();
+  const { data, error } = await db
+    .from("property_projects")
+    .select("*")
+    .eq("property_id", propertyId)
+    .eq("user_id", WORKSPACE_OWNER_ID)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as PropertyProject[];
+}
+
+export async function getProject(id: string): Promise<PropertyProject | null> {
+  const db = createServiceClient();
+  const { data, error } = await db
+    .from("property_projects")
+    .select("*")
+    .eq("id", id)
+    .eq("user_id", WORKSPACE_OWNER_ID)
+    .maybeSingle();
+  if (error) throw error;
+  return (data as PropertyProject) ?? null;
+}
+
+export type ProjectWithProperty = PropertyProject & {
+  property: Pick<Property, "id" | "name" | "island"> | null;
+};
+
+export async function listActiveProjects(): Promise<ProjectWithProperty[]> {
+  const db = createServiceClient();
+  const { data, error } = await db
+    .from("property_projects")
+    .select("*, property:properties(id, name, island)")
+    .eq("user_id", WORKSPACE_OWNER_ID)
+    .neq("status", "completed")
+    .order("due_date", { ascending: true, nullsFirst: false })
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as ProjectWithProperty[];
+}
+
+export async function listProjectNotes(projectId: string): Promise<ProjectNote[]> {
+  const db = createServiceClient();
+  const { data, error } = await db
+    .from("project_notes")
+    .select("*")
+    .eq("project_id", projectId)
+    .eq("user_id", WORKSPACE_OWNER_ID)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as ProjectNote[];
 }
 
 export type PropertyStatusSummary = {

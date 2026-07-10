@@ -81,6 +81,29 @@ export type CommonAreaEquipment = {
   created_at: string;
 };
 
+export type ProjectStatus = "open" | "in_progress" | "completed";
+
+export type PropertyProject = {
+  id: string;
+  user_id: string;
+  property_id: string;
+  title: string;
+  description: string | null;
+  status: ProjectStatus;
+  due_date: string | null;
+  completed_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ProjectNote = {
+  id: string;
+  user_id: string;
+  project_id: string;
+  content: string;
+  created_at: string;
+};
+
 export type PropertyNote = {
   id: string;
   user_id: string;
@@ -164,6 +187,11 @@ export const AREA_TYPES: AreaType[] = [
 ];
 export const INSTALL_STATUSES: InstallStatus[] = [
   "not_started",
+  "in_progress",
+  "completed",
+];
+export const PROJECT_STATUSES: ProjectStatus[] = [
+  "open",
   "in_progress",
   "completed",
 ];

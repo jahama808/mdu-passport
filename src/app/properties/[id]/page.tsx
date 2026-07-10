@@ -4,6 +4,7 @@ import { getSessionContext } from "@/lib/auth";
 import {
   getProperty,
   listCommonAreas,
+  listProjects,
   listPropertyImages,
   listPropertyNotes,
   listScanSessions,
@@ -14,6 +15,8 @@ import {
   titleCase,
   formatDate,
   statusColor,
+  projectStatusColor,
+  isOverdue,
   islandAccentStyle,
   formatPhone,
 } from "@/lib/format";
@@ -33,6 +36,7 @@ import {
   ExternalLink,
   FileSpreadsheet,
   Upload,
+  FolderKanban,
 } from "lucide-react";
 
 export default async function PropertyDetailPage({
@@ -46,12 +50,14 @@ export default async function PropertyDetailPage({
   const { id } = await params;
   const property = await getProperty(id);
   if (!property) notFound();
-  const [areas, notes, sessions, images] = await Promise.all([
+  const [areas, notes, sessions, images, projects] = await Promise.all([
     listCommonAreas(id),
     listPropertyNotes(id),
     listScanSessions(id),
     listPropertyImages(id),
+    listProjects(id),
   ]);
+  const activeProjects = projects.filter((p) => p.status !== "completed");
   const signed = await signedPhotoUrls(
     images.map((img) => img.storage_path),
     PROPERTY_IMAGES_BUCKET,
@@ -258,6 +264,66 @@ export default async function PropertyDetailPage({
               <p className="text-sm text-muted-foreground">
                 Import a markdown passport or capture sightings.
               </p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex-row items-center justify-between space-y-0">
+            <CardTitle className="text-base flex items-center gap-2">
+              <FolderKanban className="h-4 w-4" /> Projects
+            </CardTitle>
+            <Link href={`/properties/${id}/projects`}>
+              <Button size="sm" variant="outline">
+                All ({projects.length})
+              </Button>
+            </Link>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {activeProjects.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                {projects.length === 0
+                  ? "No projects yet."
+                  : "No active projects — see history."}
+              </p>
+            ) : (
+              activeProjects.slice(0, 4).map((p) => {
+                const overdue = isOverdue(p.due_date, p.status);
+                return (
+                  <Link
+                    key={p.id}
+                    href={`/properties/${id}/projects/${p.id}`}
+                    className="block border rounded-md px-3 py-2 hover:border-foreground/20 text-sm"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-medium truncate">{p.title}</span>
+                      <span
+                        className={`inline-flex text-xs px-2 py-0.5 rounded-full border ${projectStatusColor(
+                          p.status,
+                        )}`}
+                      >
+                        {titleCase(p.status)}
+                      </span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {p.due_date ? (
+                        <span
+                          className={
+                            overdue
+                              ? "text-red-600 dark:text-red-400 font-medium"
+                              : ""
+                          }
+                        >
+                          Expected finish {formatDate(p.due_date)}
+                          {overdue ? " · overdue" : ""}
+                        </span>
+                      ) : (
+                        "No expected finish date"
+                      )}
+                    </div>
+                  </Link>
+                );
+              })
             )}
           </CardContent>
         </Card>

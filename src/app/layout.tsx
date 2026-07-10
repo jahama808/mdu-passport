@@ -6,7 +6,14 @@ import { roleOf } from "@/lib/auth";
 import { Toaster } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Building2, LayoutGrid, Package, LogOut, Users } from "lucide-react";
+import {
+  Building2,
+  LayoutGrid,
+  Package,
+  LogOut,
+  Users,
+  FolderKanban,
+} from "lucide-react";
 import "./globals.css";
 
 const orbitron = Orbitron({
@@ -56,6 +63,9 @@ export default async function RootLayout({
                   </Link>
                   <Link href="/properties" className="nav-link">
                     <Building2 className="h-4 w-4" /> Properties
+                  </Link>
+                  <Link href="/projects" className="nav-link">
+                    <FolderKanban className="h-4 w-4" /> Projects
                   </Link>
                   <Link href="/equipment" className="nav-link">
                     <Package className="h-4 w-4" /> Equipment
