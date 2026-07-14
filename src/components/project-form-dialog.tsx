@@ -25,6 +25,8 @@ import {
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import {
   PROJECT_STATUSES,
+  PROJECT_PRIORITIES,
+  PROJECT_PRIORITY_DEFAULT,
   type ProjectStatus,
   type PropertyProject,
 } from "@/lib/types";
@@ -49,6 +51,7 @@ export default function ProjectFormDialog({
     title: project?.title ?? "",
     description: project?.description ?? "",
     status: (project?.status ?? "open") as ProjectStatus,
+    priority: project?.priority ?? PROJECT_PRIORITY_DEFAULT,
     due_date: project?.due_date ?? "",
   });
 
@@ -57,6 +60,7 @@ export default function ProjectFormDialog({
       title: project?.title ?? "",
       description: project?.description ?? "",
       status: project?.status ?? "open",
+      priority: project?.priority ?? PROJECT_PRIORITY_DEFAULT,
       due_date: project?.due_date ?? "",
     });
   }
@@ -73,6 +77,7 @@ export default function ProjectFormDialog({
           title: form.title,
           description: form.description || null,
           status: form.status,
+          priority: form.priority,
           due_date: form.due_date || null,
         };
         if (project) {
@@ -148,7 +153,7 @@ export default function ProjectFormDialog({
               placeholder="Scope, contacts, gear needed…"
             />
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-3">
             <div className="space-y-1.5">
               <Label>Status</Label>
               <Select
@@ -164,6 +169,25 @@ export default function ProjectFormDialog({
                   {PROJECT_STATUSES.map((s) => (
                     <SelectItem key={s} value={s}>
                       {titleCase(s)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Priority</Label>
+              <Select
+                value={String(form.priority)}
+                onValueChange={(v) => setForm({ ...form, priority: Number(v) })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {PROJECT_PRIORITIES.map((p) => (
+                    <SelectItem key={p} value={String(p)}>
+                      P{p}
+                      {p === 1 ? " · highest" : p === 10 ? " · lowest" : ""}
                     </SelectItem>
                   ))}
                 </SelectContent>

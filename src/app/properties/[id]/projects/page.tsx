@@ -6,6 +6,7 @@ import {
   titleCase,
   formatDate,
   projectStatusColor,
+  projectPriorityColor,
   isOverdue,
 } from "@/lib/format";
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,12 +28,21 @@ function ProjectRow({
     >
       <div className="flex items-center justify-between gap-2">
         <span className="font-medium truncate">{project.title}</span>
-        <span
-          className={`inline-flex text-xs px-2 py-0.5 rounded-full border ${projectStatusColor(
-            project.status,
-          )}`}
-        >
-          {titleCase(project.status)}
+        <span className="flex items-center gap-1.5 shrink-0">
+          <span
+            className={`inline-flex text-xs px-2 py-0.5 rounded-full border font-medium ${projectPriorityColor(
+              project.priority,
+            )}`}
+          >
+            P{project.priority}
+          </span>
+          <span
+            className={`inline-flex text-xs px-2 py-0.5 rounded-full border ${projectStatusColor(
+              project.status,
+            )}`}
+          >
+            {titleCase(project.status)}
+          </span>
         </span>
       </div>
       <div className="text-xs text-muted-foreground mt-0.5">

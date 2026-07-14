@@ -16,6 +16,7 @@ import {
   formatDate,
   statusColor,
   projectStatusColor,
+  projectPriorityColor,
   isOverdue,
   islandAccentStyle,
   formatPhone,
@@ -297,12 +298,21 @@ export default async function PropertyDetailPage({
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span className="font-medium truncate">{p.title}</span>
-                      <span
-                        className={`inline-flex text-xs px-2 py-0.5 rounded-full border ${projectStatusColor(
-                          p.status,
-                        )}`}
-                      >
-                        {titleCase(p.status)}
+                      <span className="flex items-center gap-1.5 shrink-0">
+                        <span
+                          className={`inline-flex text-xs px-2 py-0.5 rounded-full border font-medium ${projectPriorityColor(
+                            p.priority,
+                          )}`}
+                        >
+                          P{p.priority}
+                        </span>
+                        <span
+                          className={`inline-flex text-xs px-2 py-0.5 rounded-full border ${projectStatusColor(
+                            p.status,
+                          )}`}
+                        >
+                          {titleCase(p.status)}
+                        </span>
                       </span>
                     </div>
                     <div className="text-xs text-muted-foreground">

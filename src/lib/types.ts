@@ -90,6 +90,7 @@ export type PropertyProject = {
   title: string;
   description: string | null;
   status: ProjectStatus;
+  priority: number;
   due_date: string | null;
   completed_at: string | null;
   created_at: string;
@@ -195,3 +196,12 @@ export const PROJECT_STATUSES: ProjectStatus[] = [
   "in_progress",
   "completed",
 ];
+
+// 1 = most important, 10 = lowest priority
+export const PROJECT_PRIORITY_MIN = 1;
+export const PROJECT_PRIORITY_MAX = 10;
+export const PROJECT_PRIORITY_DEFAULT = 5;
+export const PROJECT_PRIORITIES: number[] = Array.from(
+  { length: PROJECT_PRIORITY_MAX - PROJECT_PRIORITY_MIN + 1 },
+  (_, i) => PROJECT_PRIORITY_MIN + i,
+);

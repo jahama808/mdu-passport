@@ -4,14 +4,32 @@ import { revalidatePath } from "next/cache";
 import { createServiceClient, WORKSPACE_OWNER_ID } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth";
 import type { ProjectStatus } from "@/lib/types";
-import { PROJECT_STATUSES } from "@/lib/types";
+import {
+  PROJECT_STATUSES,
+  PROJECT_PRIORITY_MIN,
+  PROJECT_PRIORITY_MAX,
+} from "@/lib/types";
 
 export type ProjectInput = {
   title: string;
   description: string | null;
   status: ProjectStatus;
+  priority: number;
   due_date: string | null;
 };
+
+function validatePriority(priority: number) {
+  if (
+    !Number.isInteger(priority) ||
+    priority < PROJECT_PRIORITY_MIN ||
+    priority > PROJECT_PRIORITY_MAX
+  ) {
+    throw new Error(
+      `Priority must be between ${PROJECT_PRIORITY_MIN} and ${PROJECT_PRIORITY_MAX}`,
+    );
+  }
+  return priority;
+}
 
 function revalidateProject(propertyId: string, projectId?: string) {
   revalidatePath(`/properties/${propertyId}`);
@@ -28,6 +46,7 @@ function validateInput(input: ProjectInput) {
     title,
     description: input.description?.trim() || null,
     status: input.status,
+    priority: validatePriority(input.priority),
     due_date: input.due_date || null,
   };
 }
@@ -90,6 +109,23 @@ export async function updateProjectStatus(
       completed_at: status === "completed" ? new Date().toISOString() : null,
       updated_at: new Date().toISOString(),
     })
+    .eq("id", projectId)
+    .eq("user_id", WORKSPACE_OWNER_ID);
+  if (error) throw error;
+  revalidateProject(propertyId, projectId);
+}
+
+export async function updateProjectPriority(
+  propertyId: string,
+  projectId: string,
+  priority: number,
+) {
+  await requireAdmin();
+  validatePriority(priority);
+  const db = createServiceClient();
+  const { error } = await db
+    .from("property_projects")
+    .update({ priority, updated_at: new Date().toISOString() })
     .eq("id", projectId)
     .eq("user_id", WORKSPACE_OWNER_ID);
   if (error) throw error;

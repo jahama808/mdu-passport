@@ -181,6 +181,7 @@ export async function listProjects(propertyId: string): Promise<PropertyProject[
     .select("*")
     .eq("property_id", propertyId)
     .eq("user_id", WORKSPACE_OWNER_ID)
+    .order("priority", { ascending: true })
     .order("created_at", { ascending: false });
   if (error) throw error;
   return (data ?? []) as PropertyProject[];
@@ -209,6 +210,7 @@ export async function listActiveProjects(): Promise<ProjectWithProperty[]> {
     .select("*, property:properties(id, name, island)")
     .eq("user_id", WORKSPACE_OWNER_ID)
     .neq("status", "completed")
+    .order("priority", { ascending: true })
     .order("due_date", { ascending: true, nullsFirst: false })
     .order("created_at", { ascending: false });
   if (error) throw error;

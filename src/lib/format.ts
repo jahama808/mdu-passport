@@ -77,6 +77,16 @@ export function projectStatusColor(status: string): string {
   return statusColor(status);
 }
 
+export function projectPriorityColor(priority: number): string {
+  if (priority <= 3) {
+    return "bg-red-100 text-red-800 border-red-300 dark:bg-red-900/30 dark:text-red-300";
+  }
+  if (priority <= 6) {
+    return "bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-900/30 dark:text-amber-300";
+  }
+  return "bg-slate-100 text-slate-700 border-slate-300 dark:bg-slate-900/30 dark:text-slate-300";
+}
+
 export function isOverdue(
   dueDate: string | null | undefined,
   status: string,

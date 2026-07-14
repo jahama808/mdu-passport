@@ -6,11 +6,13 @@ import {
   titleCase,
   formatDate,
   projectStatusColor,
+  projectPriorityColor,
   isOverdue,
 } from "@/lib/format";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ProjectFormDialog from "@/components/project-form-dialog";
 import ProjectStatusSelect from "@/components/project-status-select";
+import ProjectPrioritySelect from "@/components/project-priority-select";
 import ProjectNotes from "@/components/project-notes";
 import { CalendarClock, StickyNote } from "lucide-react";
 
@@ -39,6 +41,13 @@ export default async function ProjectDetailPage({
           <div className="flex items-center gap-2 flex-wrap">
             <h1 className="text-2xl font-semibold">{project.title}</h1>
             <span
+              className={`inline-flex text-xs px-2 py-0.5 rounded-full border font-medium ${projectPriorityColor(
+                project.priority,
+              )}`}
+            >
+              P{project.priority}
+            </span>
+            <span
               className={`inline-flex text-xs px-2 py-0.5 rounded-full border ${projectStatusColor(
                 project.status,
               )}`}
@@ -62,6 +71,11 @@ export default async function ProjectDetailPage({
         <div className="flex items-center gap-2">
           {canWrite ? (
             <>
+              <ProjectPrioritySelect
+                propertyId={id}
+                projectId={project.id}
+                priority={project.priority}
+              />
               <ProjectStatusSelect
                 propertyId={id}
                 projectId={project.id}
