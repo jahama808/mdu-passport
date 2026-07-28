@@ -217,6 +217,25 @@ export async function listActiveProjects(): Promise<ProjectWithProperty[]> {
   return (data ?? []) as ProjectWithProperty[];
 }
 
+export async function latestNotesForProjects(
+  projectIds: string[],
+): Promise<Record<string, ProjectNote>> {
+  const out: Record<string, ProjectNote> = {};
+  if (projectIds.length === 0) return out;
+  const db = createServiceClient();
+  const { data, error } = await db
+    .from("project_notes")
+    .select("*")
+    .in("project_id", projectIds)
+    .eq("user_id", WORKSPACE_OWNER_ID)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  for (const row of (data ?? []) as ProjectNote[]) {
+    if (!out[row.project_id]) out[row.project_id] = row;
+  }
+  return out;
+}
+
 export async function listProjectNotes(projectId: string): Promise<ProjectNote[]> {
   const db = createServiceClient();
   const { data, error } = await db
