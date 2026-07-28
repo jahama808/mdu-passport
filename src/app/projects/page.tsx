@@ -1,12 +1,10 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { FileSpreadsheet } from "lucide-react";
 import { getSessionContext } from "@/lib/auth";
 import { listActiveProjects } from "@/lib/data";
 import { isOverdue } from "@/lib/format";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import ActiveProjectsGrid from "@/components/active-projects-grid";
+import ExportProjectsButton from "@/components/export-projects-button";
 
 export default async function ProjectsOverviewPage() {
   const { user, role } = await getSessionContext();
@@ -28,11 +26,7 @@ export default async function ProjectsOverviewPage() {
             property page
           </p>
         </div>
-        <Link href="/api/projects/export">
-          <Button variant="outline" size="sm">
-            <FileSpreadsheet className="h-4 w-4 mr-2" /> Export Excel
-          </Button>
-        </Link>
+        <ExportProjectsButton />
       </div>
 
       {projects.length === 0 ? (
