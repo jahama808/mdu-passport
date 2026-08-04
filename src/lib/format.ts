@@ -96,6 +96,19 @@ export function isOverdue(
   return !Number.isNaN(due.getTime()) && due < new Date();
 }
 
+const STALE_UPDATE_DAYS = 14;
+
+export function isStaleUpdate(
+  updatedAt: string | null | undefined,
+  days = STALE_UPDATE_DAYS,
+): boolean {
+  if (!updatedAt) return false;
+  const updated = new Date(updatedAt);
+  if (Number.isNaN(updated.getTime())) return false;
+  const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+  return updated.getTime() < cutoff;
+}
+
 const ISLAND_ACCENT: Record<Island, string> = {
   "kauai":      "var(--island-kauai)",
   "oahu":       "var(--island-oahu)",
