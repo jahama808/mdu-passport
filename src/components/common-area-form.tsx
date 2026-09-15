@@ -345,7 +345,7 @@ export default function CommonAreaForm({
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-xs">Notes</Label>
+                    <Label className="text-xs">Physical Location</Label>
                     <Input
                       value={row.notes ?? ""}
                       onChange={(e) => updateRow(i, { notes: e.target.value })}

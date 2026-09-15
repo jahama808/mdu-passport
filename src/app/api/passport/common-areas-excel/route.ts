@@ -276,7 +276,7 @@ export async function GET(req: Request) {
         "Model",
         "Qty",
         "Category",
-        "Notes",
+        "Physical Location",
       ]);
       header.font = { bold: true };
       header.eachCell((cell) => {
@@ -429,7 +429,7 @@ export async function GET(req: Request) {
             "Model",
             "Qty",
             "Category",
-            "Notes",
+            "Physical Location",
           ]);
           header.font = { bold: true };
           header.eachCell((cell) => {
